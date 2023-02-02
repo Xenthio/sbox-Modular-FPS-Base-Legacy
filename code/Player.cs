@@ -27,6 +27,7 @@ partial class Player : AnimatedEntity
 
 	public override void BuildInput()
 	{
+		base.BuildInput();
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
 		{
 			i.BuildInput();
