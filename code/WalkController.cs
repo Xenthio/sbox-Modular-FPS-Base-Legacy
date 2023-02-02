@@ -237,7 +237,7 @@ public partial class WalkController : SimulatedComponent
 
 		SaveGroundPos();
 
-		bool Debug = true;
+		bool Debug = false;
 		if ( Debug )
 		{
 			DebugOverlay.Box( Entity.Position + TraceOffset, mins, maxs, Color.Red );
