@@ -22,42 +22,36 @@ public class Gun : Weapon
 			TimeSincePrimaryReload = 0;
 			ReloadPrimary();
 		}
-		if ( !IsPrimaryReloading )
+		if ( CanPrimaryAttack() && !IsPrimaryReloading )
 		{
-			if ( CanPrimaryAttack() )
+			TimeSincePrimaryAttack = 0;
+			if ( PrimaryAmmo > 0 )
 			{
-				TimeSincePrimaryAttack = 0;
-				if ( PrimaryAmmo > 0 )
+				using ( LagCompensation() )
 				{
-					using ( LagCompensation() )
-					{
-						PrimaryAttack();
-					}
-				}
-				else
-				{
-					TimeSincePrimaryReload = 0;
-					ReloadPrimary();
+					PrimaryAttack();
 				}
 			}
-		}
-		if ( !IsSecondaryReloading )
-		{
-			if ( CanSecondaryAttack() )
+			else
 			{
-				TimeSinceSecondaryAttack = 0;
-				if ( SecondaryAmmo > 0 )
+				TimeSincePrimaryReload = 0;
+				ReloadPrimary();
+			}
+		}
+		if ( CanSecondaryAttack() && !IsSecondaryReloading )
+		{
+			TimeSinceSecondaryAttack = 0;
+			if ( SecondaryAmmo > 0 )
+			{
+				using ( LagCompensation() )
 				{
-					using ( LagCompensation() )
-					{
-						SecondaryAttack();
-					}
+					SecondaryAttack();
 				}
-				else
-				{
-					TimeSinceSecondaryReload = 0;
-					ReloadSecondary();
-				}
+			}
+			else
+			{
+				TimeSinceSecondaryReload = 0;
+				ReloadSecondary();
 			}
 		}
 	}
