@@ -2,17 +2,19 @@
 
 namespace MyGame;
 
-public class FirstPersonCamera : SimulatedComponent
+public class FirstPersonCamera : CameraComponent
 {
 	public override void FrameSimulate( IClient cl )
 	{
 
 		var pl = Entity as Player;
-		// Update rotation every frame, to keep things smooth
-		Entity.Rotation = pl.ViewAngles.ToRotation();
+		// Update rotation every frame, to keep things smooth  
 
-		Camera.Position = Entity.Position + new Vector3( 0, 0, 64 );
-		Camera.Rotation = Entity.Rotation;
+		pl.EyeRotation = pl.ViewAngles.ToRotation();
+		pl.Rotation = pl.ViewAngles.WithPitch( 0f ).ToRotation();
+
+		Camera.Position = pl.EyePosition;
+		Camera.Rotation = pl.ViewAngles.ToRotation();
 
 		// Set field of view to whatever the user chose in options
 		Camera.FieldOfView = Screen.CreateVerticalFieldOfView( Game.Preferences.FieldOfView );

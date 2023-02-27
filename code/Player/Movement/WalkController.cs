@@ -1,9 +1,11 @@
 ﻿
 using Sandbox;
 using System;
+using static Sandbox.Event;
+
 namespace MyGame;
 [Library]
-public partial class WalkController : SimulatedComponent
+public partial class WalkController : MovementComponent
 {
 	[Net] public float SprintSpeed { get; set; } = 320.0f;
 	[Net] public float WalkSpeed { get; set; } = 150.0f;
@@ -40,6 +42,8 @@ public partial class WalkController : SimulatedComponent
 	public BBox GetHull()
 	{
 		var girth = BodyGirth * 0.5f;
+		var height = BodyHeight;
+		if ( IsDucking ) height = 32;
 		var mins = new Vector3( -girth, -girth, 0 );
 		var maxs = new Vector3( +girth, +girth, BodyHeight );
 
@@ -60,7 +64,6 @@ public partial class WalkController : SimulatedComponent
 	/// </summary>
 	public Vector3 TraceOffset;
 
-	public Vector3 WishVelocity { get; set; }
 	public virtual void SetBBox( Vector3 mins, Vector3 maxs )
 	{
 		if ( this.mins == mins && this.maxs == maxs )
@@ -76,9 +79,11 @@ public partial class WalkController : SimulatedComponent
 	public virtual void UpdateBBox()
 	{
 		var girth = BodyGirth * 0.5f;
+		var height = BodyHeight;
+		if ( IsDucking ) height = 32;
 
 		var mins = new Vector3( -girth, -girth, 0 ) * Entity.Scale;
-		var maxs = new Vector3( +girth, +girth, BodyHeight ) * Entity.Scale;
+		var maxs = new Vector3( +girth, +girth, height ) * Entity.Scale;
 
 		SetBBox( mins, maxs );
 	}
@@ -89,8 +94,9 @@ public partial class WalkController : SimulatedComponent
 	public override void FrameSimulate( IClient cl )
 	{
 		base.FrameSimulate( cl );
-
+		RestoreGroundAngles();
 		var pl = Entity as Player;
+		SaveGroundAngles();
 	}
 
 	public override void BuildInput()
@@ -103,14 +109,27 @@ public partial class WalkController : SimulatedComponent
 	{
 		var pl = Entity as Player;
 
-		UpdateBBox();
+		Events?.Clear();
+		Tags?.Clear();
 
+		pl.EyeLocalPosition = Vector3.Up * (EyeHeight * pl.Scale);
+
+		// If we're a bot, spin us around 180 degrees.
+		if ( pl.Client.IsBot )
+			pl.EyeRotation = pl.ViewAngles.WithYaw( pl.ViewAngles.yaw + 180f ).ToRotation();
+		else
+			pl.EyeRotation = pl.ViewAngles.ToRotation();
+
+
+		DuckSimulate();
+		CheckDuck();
+		UpdateBBox();
 
 
 		RestoreGroundPos();
 
-		//Velocity += BaseVelocity * ( 1 + Time.Delta * 0.5f );
-		//BaseVelocity = Vector3.Zero;
+		//Entity.Velocity += Entity.BaseVelocity * (1 + Time.Delta * 0.5f);
+		//Entity.BaseVelocity = Vector3.Zero;
 
 		//Rot = Rotation.LookAt( Input.Rotation.Forward.WithZ( 0 ), Vector3.Up );
 
@@ -418,6 +437,107 @@ public partial class WalkController : SimulatedComponent
 		// mv->m_outWishVel -= (1.f-newspeed) * mv->m_vecVelocity;
 	}
 
+	[Net] public bool IsDucking { get; set; } // replicate
+	public float DuckAmount { get; set; } = 0;
+	public virtual void CheckDuck()
+	{
+		var pl = Entity as Player;
+		bool wants = Input.Down( InputButton.Duck );
+
+		if ( wants != IsDucking )
+		{
+			if ( wants ) TryDuck();
+			else TryUnDuck();
+		}
+
+		if ( IsDucking )
+		{
+			var delta = DuckAmount;
+			if ( Game.IsServer ) DuckAmount = DuckAmount.LerpTo( -32, 8 * Time.Delta );
+			delta -= DuckAmount;
+			SetTag( "ducked" );
+			if ( pl.GroundEntity is null )
+			{
+				pl.Position += Vector3.Up * (delta);
+			}
+			FixPlayerCrouchStuck( true );
+			CategorizePosition( false );
+		}
+		else
+		{
+			var delta = DuckAmount;
+			if ( Game.IsServer ) DuckAmount = DuckAmount.LerpTo( 0, 8 * Time.Delta );
+			delta -= DuckAmount;
+
+			if ( pl.GroundEntity is null )
+			{
+				pl.Position += Vector3.Up * (delta);
+			}
+			CategorizePosition( false );
+		}
+
+	}
+
+	public virtual void DuckSimulate()
+	{
+		var pl = Entity as Player;
+		if ( IsDucking )
+		{
+			DuckAmount = DuckAmount.LerpTo( -32, 8 * Time.Delta );
+			pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( pl.EyeLocalPosition.z + DuckAmount );
+		}
+		else
+		{
+			DuckAmount = DuckAmount.LerpTo( 0, 8 * Time.Delta );
+			if ( DuckAmount != 0 )
+			{
+
+				pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( pl.EyeLocalPosition.z + DuckAmount );
+			}
+		}
+	}
+	public virtual void TryDuck()
+	{
+		IsDucking = true;
+	}
+
+	public virtual void TryUnDuck()
+	{
+
+		IsDucking = false;
+		UpdateBBox();
+		var pm = TraceBBox( Entity.Position, Entity.Position );
+		if ( pm.StartedSolid )
+		{
+
+			IsDucking = true;
+			return;
+		}
+
+		IsDucking = false;
+	}
+	public virtual void FixPlayerCrouchStuck( bool upward )
+	{
+		int direction = upward ? 1 : 0;
+
+		var trace = TraceBBox( Entity.Position, Entity.Position );
+		if ( trace.Entity == null )
+			return;
+
+		var test = Entity.Position;
+		for ( int i = 0; i < 36; i++ )
+		{
+			var org = Entity.Position;
+			org.z += direction;
+
+			Entity.Position = org;
+			trace = TraceBBox( Entity.Position, Entity.Position );
+			if ( trace.Entity == null )
+				return;
+		}
+
+		Entity.Position = test;
+	}
 	public virtual void CheckJumpButton()
 	{
 		//if ( !player->CanJump() )
@@ -495,7 +615,7 @@ public partial class WalkController : SimulatedComponent
 		// don't jump again until released
 		//mv->m_nOldButtons |= IN_JUMP;
 
-		//Entity.AddEvent( "jump" );
+		AddEvent( "jump" );
 
 	}
 
@@ -750,21 +870,54 @@ public partial class WalkController : SimulatedComponent
 		Entity.Position = trace.EndPosition;
 	}
 
+	[Local, Predicted] public Transform? GroundTransform { get; set; }
 	void RestoreGroundPos()
 	{
-		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld )
+		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransform == null )
 			return;
 
-		//var Position = GroundEntity.Transform.ToWorld( GroundTransform );
-		//Pos = Position.Position;
+		var worldTrns = Entity.GroundEntity.Transform.ToWorld( GroundTransform.Value );
+		//Entity.Position = worldTrns.Position;
+		//Entity.Rotation = worldTrns.Rotation;
+		Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
 	}
 
 	void SaveGroundPos()
 	{
+		var ply = Entity as Player;
 		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld )
+		{
+			GroundTransform = null;
+			return;
+		}
+		GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
+	}
+
+	public Transform? GroundTransformViewAngles { get; set; }
+	public Angles? PreviousViewAngles { get; set; }
+	void RestoreGroundAngles()
+	{
+		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransformViewAngles == null || PreviousViewAngles == null )
 			return;
 
-		//GroundTransform = GroundEntity.Transform.ToLocal( new Transform( Pos, Rot ) );
+		var ply = Entity as Player;
+
+		var worldTrnsView = Entity.GroundEntity.Transform.ToWorld( GroundTransformViewAngles.Value );
+		ply.ViewAngles -= (PreviousViewAngles.Value - worldTrnsView.Rotation.Angles()).WithPitch( 0 ).WithRoll( 0 );
+	}
+	void SaveGroundAngles()
+	{
+
+		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld )
+		{
+			GroundTransformViewAngles = null;
+			return;
+		}
+
+		var ply = Entity as Player;
+
+		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
+		PreviousViewAngles = ply.ViewAngles;
 	}
 
 }
