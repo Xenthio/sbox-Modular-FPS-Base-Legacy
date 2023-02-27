@@ -18,6 +18,7 @@ public class FirstPersonCamera : CameraComponent
 
 		// Set field of view to whatever the user chose in options
 		Camera.FieldOfView = Screen.CreateVerticalFieldOfView( Game.Preferences.FieldOfView );
+		Camera.Main.SetViewModelCamera( Screen.CreateVerticalFieldOfView( Game.Preferences.FieldOfView ) );
 
 		// Set the first person viewer to this, so it won't render our model
 		Camera.FirstPersonViewer = Entity;
