@@ -876,10 +876,14 @@ public partial class WalkController : MovementComponent
 		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransform == null )
 			return;
 
-		var worldTrns = Entity.GroundEntity.Transform.ToWorld( GroundTransform.Value );
-		//Entity.Position = worldTrns.Position;
-		//Entity.Rotation = worldTrns.Rotation;
-		Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
+
+		using ( Sandbox.Entity.LagCompensation() )
+		{
+			var worldTrns = Entity.GroundEntity.Transform.ToWorld( GroundTransform.Value );
+			//Entity.Position = worldTrns.Position;
+			//Entity.Rotation = worldTrns.Rotation;
+			Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
+		}
 	}
 
 	void SaveGroundPos()
@@ -890,7 +894,10 @@ public partial class WalkController : MovementComponent
 			GroundTransform = null;
 			return;
 		}
-		GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
+		using ( Sandbox.Entity.LagCompensation() )
+		{
+			GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
+		}
 	}
 
 	public Transform? GroundTransformViewAngles { get; set; }
@@ -901,9 +908,11 @@ public partial class WalkController : MovementComponent
 			return;
 
 		var ply = Entity as Player;
-
-		var worldTrnsView = Entity.GroundEntity.Transform.ToWorld( GroundTransformViewAngles.Value );
-		ply.ViewAngles -= (PreviousViewAngles.Value - worldTrnsView.Rotation.Angles()).WithPitch( 0 ).WithRoll( 0 );
+		using ( Sandbox.Entity.LagCompensation() )
+		{
+			var worldTrnsView = Entity.GroundEntity.Transform.ToWorld( GroundTransformViewAngles.Value );
+			ply.ViewAngles -= (PreviousViewAngles.Value - worldTrnsView.Rotation.Angles()).WithPitch( 0 ).WithRoll( 0 );
+		}
 	}
 	void SaveGroundAngles()
 	{
@@ -916,8 +925,11 @@ public partial class WalkController : MovementComponent
 
 		var ply = Entity as Player;
 
-		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
-		PreviousViewAngles = ply.ViewAngles;
+		using ( Sandbox.Entity.LagCompensation() )
+		{
+			GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
+			PreviousViewAngles = ply.ViewAngles;
+		}
 	}
 
 }
