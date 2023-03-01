@@ -284,7 +284,7 @@ public partial class WalkController : MovementComponent
 		var ws = -1;// Duck.GetWishSpeed();
 		if ( ws >= 0 ) return ws;
 
-		if ( Input.Down( InputButton.Duck ) ) return CrouchSpeed;
+		if ( Input.Down( InputButton.Duck ) || IsDucking ) return CrouchSpeed;
 		if ( Input.Down( InputButton.Run ) ) return SprintSpeed;
 		if ( Input.Down( InputButton.Walk ) ) return WalkSpeed;
 
