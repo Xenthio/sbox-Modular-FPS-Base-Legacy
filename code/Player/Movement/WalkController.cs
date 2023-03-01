@@ -904,7 +904,7 @@ public partial class WalkController : MovementComponent
 		{
 			if ( Entity.GroundEntity == OldGroundEntity )
 			{
-				GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
+				GroundTransform = Entity.GroundEntity.Transform.ToLocal( Entity.Transform );
 			}
 			else
 			{
@@ -936,7 +936,7 @@ public partial class WalkController : MovementComponent
 		}
 
 		var ply = Entity as Player;
-		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
+		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( Entity.Transform );
 		PreviousViewAngles = ply.ViewAngles;
 	}
 
