@@ -936,7 +936,7 @@ public partial class WalkController : MovementComponent
 		}
 
 		var ply = Entity as Player;
-		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( Entity.Transform );
+		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
 		PreviousViewAngles = ply.ViewAngles;
 	}
 
