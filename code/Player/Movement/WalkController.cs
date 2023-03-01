@@ -1,7 +1,6 @@
 ﻿
 using Sandbox;
 using System;
-using static Sandbox.Event;
 
 namespace MyGame;
 [Library]
@@ -897,7 +896,7 @@ public partial class WalkController : MovementComponent
 		var ply = Entity as Player;
 		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || Entity.GroundEntity != OldGroundEntity )
 		{
-			OldGroundEntity = null;
+			OldGroundEntity = Entity.GroundEntity;
 			GroundTransform = null;
 			return;
 		}
