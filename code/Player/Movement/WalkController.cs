@@ -123,7 +123,6 @@ public partial class WalkController : MovementComponent
 			pl.EyeRotation = pl.ViewAngles.ToRotation();
 
 
-		DuckSimulate();
 		CheckDuck();
 		UpdateBBox();
 
@@ -455,7 +454,7 @@ public partial class WalkController : MovementComponent
 		if ( IsDucking )
 		{
 			var delta = DuckAmount;
-			DuckAmount = DuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * 0.016f );
+			DuckAmount = DuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * Time.Delta );
 			delta -= DuckAmount;
 			SetTag( "ducked" );
 			if ( pl.GroundEntity is null )
@@ -473,7 +472,7 @@ public partial class WalkController : MovementComponent
 		else
 		{
 			var delta = DuckAmount;
-			DuckAmount = DuckAmount.LerpTo( 0, 8 * 0.016f );
+			DuckAmount = DuckAmount.LerpTo( 0, 8 * Time.Delta );
 			delta -= DuckAmount;
 
 			if ( pl.GroundEntity is null )
@@ -488,26 +487,8 @@ public partial class WalkController : MovementComponent
 			}
 			CategorizePosition( false );
 		}
+		pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( pl.EyeLocalPosition.z + DuckAmount );
 
-	}
-
-	public virtual void DuckSimulate()
-	{
-		var pl = Entity as Player;
-		if ( IsDucking )
-		{
-			//DuckAmount = DuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * Time.Delta );
-			pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( pl.EyeLocalPosition.z + DuckAmount );
-		}
-		else
-		{
-			//DuckAmount = DuckAmount.LerpTo( 0, 8 * Time.Delta );
-			if ( DuckAmount != 0 )
-			{
-
-				pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( pl.EyeLocalPosition.z + DuckAmount );
-			}
-		}
 	}
 	public virtual void TryDuck()
 	{
@@ -525,6 +506,7 @@ public partial class WalkController : MovementComponent
 		}
 		IsDucking = false;
 	}
+
 	public virtual void FixPlayerCrouchStuck( bool upward )
 	{
 		int direction = upward ? 1 : 0;
