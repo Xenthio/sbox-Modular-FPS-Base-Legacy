@@ -111,14 +111,15 @@ partial class Player : AnimatedEntity
 	public override void BuildInput()
 	{
 		base.BuildInput();
+		// these are to be done in order and before the simulated components
+		MovementController.BuildInput();
+		CameraController.BuildInput();
+		AnimationController.BuildInput();
+
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
 		{
 			if ( i.Enabled ) i.BuildInput();
 		}
-		// these are to be done in order and after the other ones
-		MovementController.BuildInput();
-		CameraController.BuildInput();
-		AnimationController.BuildInput();
 	}
 
 	/// <summary>
@@ -140,14 +141,14 @@ partial class Player : AnimatedEntity
 				Inventory?.SwitchActiveSlot( -1, false );
 			}
 		}
+		// these are to be done in order and before the simulated components
+		MovementController.Simulate( cl );
+		CameraController.Simulate( cl );
+		AnimationController.Simulate( cl );
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
 		{
 			if ( i.Enabled ) i.Simulate( cl );
 		}
-		// these are to be done in order and after the other ones
-		MovementController.Simulate( cl );
-		CameraController.Simulate( cl );
-		AnimationController.Simulate( cl );
 	}
 
 	/// <summary>
@@ -156,13 +157,13 @@ partial class Player : AnimatedEntity
 	public override void FrameSimulate( IClient cl )
 	{
 		base.FrameSimulate( cl );
+		// these are to be done in order and before the simulated components
+		MovementController.FrameSimulate( cl );
+		CameraController.FrameSimulate( cl );
+		AnimationController.FrameSimulate( cl );
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
 		{
 			if ( i.Enabled ) i.FrameSimulate( cl );
 		}
-		// these are to be done in order and after the other ones
-		MovementController.FrameSimulate( cl );
-		CameraController.FrameSimulate( cl );
-		AnimationController.FrameSimulate( cl );
 	}
 }
