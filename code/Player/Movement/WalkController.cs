@@ -8,6 +8,7 @@ public partial class WalkController : MovementComponent
 {
 	[Net] public float SprintSpeed { get; set; } = 320.0f;
 	[Net] public float WalkSpeed { get; set; } = 150.0f;
+	[Net] public float CrouchSpeed { get; set; } = 80.0f;
 	[Net] public float DefaultSpeed { get; set; } = 190.0f;
 	[Net] public float Acceleration { get; set; } = 10.0f;
 	[Net] public float AirAcceleration { get; set; } = 50.0f;
@@ -283,6 +284,7 @@ public partial class WalkController : MovementComponent
 		var ws = -1;// Duck.GetWishSpeed();
 		if ( ws >= 0 ) return ws;
 
+		if ( Input.Down( InputButton.Duck ) ) return CrouchSpeed;
 		if ( Input.Down( InputButton.Run ) ) return SprintSpeed;
 		if ( Input.Down( InputButton.Walk ) ) return WalkSpeed;
 
