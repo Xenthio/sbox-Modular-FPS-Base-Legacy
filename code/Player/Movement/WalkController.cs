@@ -99,6 +99,7 @@ public partial class WalkController : MovementComponent
 		RestoreGroundAngles();
 		var pl = Entity as Player;
 		SaveGroundAngles();
+		DuckFrameSimulate();
 	}
 
 	public override void BuildInput()
@@ -487,8 +488,23 @@ public partial class WalkController : MovementComponent
 			}
 			CategorizePosition( false );
 		}
-		pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( pl.EyeLocalPosition.z + DuckAmount );
+		pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( EyeHeight + DuckAmount );
 
+	}
+	public float LocalDuckAmount { get; set; } = 0;
+	void DuckFrameSimulate()
+	{
+
+		var pl = Entity as Player;
+		if ( IsDucking )
+		{
+			LocalDuckAmount = LocalDuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * Time.Delta );
+		}
+		else
+		{
+			LocalDuckAmount = LocalDuckAmount.LerpTo( 0, 8 * Time.Delta );
+		}
+		pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( EyeHeight + LocalDuckAmount );
 	}
 	public virtual void TryDuck()
 	{
