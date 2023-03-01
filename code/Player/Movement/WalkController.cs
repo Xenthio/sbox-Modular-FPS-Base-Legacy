@@ -83,7 +83,6 @@ public partial class WalkController : MovementComponent
 		var girth = BodyGirth * 0.5f;
 		var height = BodyHeight;
 		if ( IsDucking || forceduck == 1 ) height = (EyeHeight + DuckAmount) + (BodyHeight - EyeHeight);
-		Log.Info( height );
 		if ( forceduck == -1 ) height = BodyHeight;
 
 		var mins = new Vector3( -girth, -girth, 0 ) * Entity.Scale;
@@ -883,6 +882,7 @@ public partial class WalkController : MovementComponent
 	}
 
 	public Transform? GroundTransform { get; set; }
+	public Sandbox.Entity? OldGroundEntity { get; set; }
 	void RestoreGroundPos()
 	{
 		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransform == null )
@@ -895,14 +895,18 @@ public partial class WalkController : MovementComponent
 	void SaveGroundPos()
 	{
 		var ply = Entity as Player;
-		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld )
+		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || Entity.GroundEntity != OldGroundEntity )
 		{
+			OldGroundEntity = null;
 			GroundTransform = null;
 			return;
 		}
 
 		if ( Prediction.FirstTime )
+		{
 			GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
+			OldGroundEntity = Entity.GroundEntity;
+		}
 	}
 
 	public Transform? GroundTransformViewAngles { get; set; }
