@@ -26,7 +26,7 @@ public partial class WalkController : MovementComponent
 	[Net] public float BodyHeight { get; set; } = 72.0f;
 	[Net] public float EyeHeight { get; set; } = 64.0f;
 	[Net] public float DuckHeight { get; set; } = 32.0f;
-	[Net] public float DuckEyeHeight { get; set; } = 28.0f;
+	[Net] public float DuckEyeHeight { get; set; } = 24.0f;
 	[Net] public float Gravity { get; set; } = 800.0f;
 	[Net] public float AirControl { get; set; } = 30.0f;
 	public bool Swimming { get; set; } = false;
@@ -82,7 +82,8 @@ public partial class WalkController : MovementComponent
 	{
 		var girth = BodyGirth * 0.5f;
 		var height = BodyHeight;
-		if ( IsDucking || forceduck == 1 ) height = DuckHeight;
+		if ( IsDucking || forceduck == 1 ) height = (EyeHeight + DuckAmount) + (BodyHeight - EyeHeight);
+		Log.Info( height );
 		if ( forceduck == -1 ) height = BodyHeight;
 
 		var mins = new Vector3( -girth, -girth, 0 ) * Entity.Scale;
@@ -440,7 +441,7 @@ public partial class WalkController : MovementComponent
 		// mv->m_outWishVel -= (1.f-newspeed) * mv->m_vecVelocity;
 	}
 
-	[Net] public bool IsDucking { get; set; } // replicate
+	[Net, Predicted] public bool IsDucking { get; set; } // replicate
 	public float DuckAmount { get; set; } = 0;
 	public virtual void CheckDuck()
 	{
@@ -456,12 +457,17 @@ public partial class WalkController : MovementComponent
 		if ( IsDucking )
 		{
 			var delta = DuckAmount;
-			if ( Game.IsServer ) DuckAmount = DuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * Time.Delta );
+			DuckAmount = DuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * 0.016f );
 			delta -= DuckAmount;
 			SetTag( "ducked" );
 			if ( pl.GroundEntity is null )
 			{
 				pl.Position += Vector3.Up * (delta);
+				var pm = TraceBBox( Entity.Position, Entity.Position );
+				if ( pm.StartedSolid )
+				{
+					pl.Position -= Vector3.Up * (delta);
+				}
 			}
 			FixPlayerCrouchStuck( true );
 			CategorizePosition( false );
@@ -469,12 +475,18 @@ public partial class WalkController : MovementComponent
 		else
 		{
 			var delta = DuckAmount;
-			if ( Game.IsServer ) DuckAmount = DuckAmount.LerpTo( 0, 8 * Time.Delta );
+			DuckAmount = DuckAmount.LerpTo( 0, 8 * 0.016f );
 			delta -= DuckAmount;
 
 			if ( pl.GroundEntity is null )
 			{
 				pl.Position += Vector3.Up * (delta);
+
+				var pm = TraceBBox( Entity.Position, Entity.Position );
+				if ( pm.StartedSolid )
+				{
+					pl.Position -= Vector3.Up * (delta);
+				}
 			}
 			CategorizePosition( false );
 		}
@@ -486,12 +498,12 @@ public partial class WalkController : MovementComponent
 		var pl = Entity as Player;
 		if ( IsDucking )
 		{
-			DuckAmount = DuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * Time.Delta );
+			//DuckAmount = DuckAmount.LerpTo( (EyeHeight - DuckEyeHeight) * -1, 8 * Time.Delta );
 			pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( pl.EyeLocalPosition.z + DuckAmount );
 		}
 		else
 		{
-			DuckAmount = DuckAmount.LerpTo( 0, 8 * Time.Delta );
+			//DuckAmount = DuckAmount.LerpTo( 0, 8 * Time.Delta );
 			if ( DuckAmount != 0 )
 			{
 
