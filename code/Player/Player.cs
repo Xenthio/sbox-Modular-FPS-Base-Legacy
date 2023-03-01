@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 
 using System.ComponentModel;
+
 namespace MyGame;
 
 partial class Player : AnimatedEntity
@@ -114,6 +115,10 @@ partial class Player : AnimatedEntity
 		{
 			if ( i.Enabled ) i.BuildInput();
 		}
+		// these are to be done in order and after the other ones
+		MovementController.BuildInput();
+		CameraController.BuildInput();
+		AnimationController.BuildInput();
 	}
 
 	/// <summary>
@@ -139,6 +144,10 @@ partial class Player : AnimatedEntity
 		{
 			if ( i.Enabled ) i.Simulate( cl );
 		}
+		// these are to be done in order and after the other ones
+		MovementController.Simulate( cl );
+		CameraController.Simulate( cl );
+		AnimationController.Simulate( cl );
 	}
 
 	/// <summary>
@@ -151,5 +160,9 @@ partial class Player : AnimatedEntity
 		{
 			if ( i.Enabled ) i.FrameSimulate( cl );
 		}
+		// these are to be done in order and after the other ones
+		MovementController.FrameSimulate( cl );
+		CameraController.FrameSimulate( cl );
+		AnimationController.FrameSimulate( cl );
 	}
 }

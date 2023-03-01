@@ -7,8 +7,21 @@ namespace MyGame;
 /// <summary>
 /// Component designed for movement, only 1 per pawn.
 /// </summary>
-public class MovementComponent : SimulatedComponent, ISingletonComponent
+public class MovementComponent : EntityComponent<Player>, ISingletonComponent
 {
+
+	public virtual void Simulate( IClient cl )
+	{
+
+	}
+	public virtual void FrameSimulate( IClient cl )
+	{
+
+	}
+	public virtual void BuildInput()
+	{
+
+	}
 	public Vector3 WishVelocity { get; set; }
 
 	internal HashSet<string> Events = new( StringComparer.OrdinalIgnoreCase );
