@@ -127,8 +127,6 @@ partial class Player : AnimatedEntity
 	/// </summary>
 	public override void Simulate( IClient cl )
 	{
-
-		EyeLocalPosition = Vector3.Up * (64f * Scale);
 		base.Simulate( cl );
 		if ( Game.IsClient )
 		{
