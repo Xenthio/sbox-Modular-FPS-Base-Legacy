@@ -884,7 +884,7 @@ public partial class WalkController : MovementComponent
 	public Sandbox.Entity? OldGroundEntity { get; set; }
 	void RestoreGroundPos()
 	{
-		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransform == null )
+		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransform == null || Entity.GroundEntity != OldGroundEntity )
 			return;
 
 		var worldTrns = Entity.GroundEntity.Transform.ToWorld( GroundTransform.Value );
@@ -894,9 +894,9 @@ public partial class WalkController : MovementComponent
 	void SaveGroundPos()
 	{
 		var ply = Entity as Player;
-		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || Entity.GroundEntity != OldGroundEntity )
+		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld )
 		{
-			OldGroundEntity = Entity.GroundEntity;
+			OldGroundEntity = null;
 			GroundTransform = null;
 			return;
 		}
@@ -904,6 +904,15 @@ public partial class WalkController : MovementComponent
 		if ( Prediction.FirstTime )
 		{
 			GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
+			if ( Entity.GroundEntity == OldGroundEntity )
+			{
+				GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
+			}
+			else
+			{
+				GroundTransform = null;
+				GroundTransformViewAngles = null;
+			}
 			OldGroundEntity = Entity.GroundEntity;
 		}
 	}
