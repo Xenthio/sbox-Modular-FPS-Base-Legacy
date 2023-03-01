@@ -440,7 +440,7 @@ public partial class WalkController : MovementComponent
 	}
 
 	[Net, Predicted] public bool IsDucking { get; set; } // replicate
-	public float DuckAmount { get; set; } = 0;
+	[Net, Predicted] public float DuckAmount { get; set; } = 0;
 	public virtual void CheckDuck()
 	{
 		var pl = Entity as Player;
@@ -523,7 +523,6 @@ public partial class WalkController : MovementComponent
 			UpdateBBox();
 			return;
 		}
-
 		IsDucking = false;
 	}
 	public virtual void FixPlayerCrouchStuck( bool upward )
