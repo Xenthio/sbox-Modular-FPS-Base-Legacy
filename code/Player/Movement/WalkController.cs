@@ -902,7 +902,6 @@ public partial class WalkController : MovementComponent
 
 		if ( Prediction.FirstTime )
 		{
-			GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
 			if ( Entity.GroundEntity == OldGroundEntity )
 			{
 				GroundTransform = Entity.GroundEntity.Transform.ToLocal( new Transform( Entity.Position + Vector3.Up * 0f, Entity.Rotation ) );
