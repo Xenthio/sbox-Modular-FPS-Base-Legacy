@@ -29,6 +29,7 @@ public partial class WalkController : MovementComponent
 	[Net] public float DuckEyeHeight { get; set; } = 24.0f;
 	[Net] public float Gravity { get; set; } = 800.0f;
 	[Net] public float AirControl { get; set; } = 30.0f;
+	[ConVar.Replicated( "walkcontroller_showbbox" )] public bool ShowBBox { get; set; } = false;
 	public bool Swimming { get; set; } = false;
 	[Net] public bool AutoJump { get; set; } = false;
 
@@ -97,6 +98,7 @@ public partial class WalkController : MovementComponent
 	public override void FrameSimulate( IClient cl )
 	{
 		base.FrameSimulate( cl );
+		if ( ShowBBox ) DebugOverlay.Box( Entity.Position, mins, maxs, Color.Yellow );
 		RestoreGroundAngles();
 		var pl = Entity as Player;
 		SaveGroundAngles();
