@@ -128,6 +128,18 @@ partial class Player : AnimatedEntity
 	public override void Simulate( IClient cl )
 	{
 		base.Simulate( cl );
+		// toggleable third person
+		if ( Input.Pressed( InputButton.View ) && Game.IsServer )
+		{
+			if ( CameraController is FirstPersonCamera )
+			{
+				Components.Add( new ThirdPersonCamera() );
+			}
+			else if ( CameraController is ThirdPersonCamera )
+			{
+				Components.Add( new FirstPersonCamera() );
+			}
+		}
 		if ( Game.IsClient )
 		{
 			if ( Input.Pressed( InputButton.SlotNext ) )
