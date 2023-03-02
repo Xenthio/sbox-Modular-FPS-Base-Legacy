@@ -81,8 +81,8 @@ public partial class WalkController : MovementComponent
 	public virtual void UpdateBBox( int forceduck = 0 )
 	{
 		var girth = BodyGirth * 0.5f;
-		var height = BodyHeight;
-		if ( IsDucking || forceduck == 1 ) height = (EyeHeight + DuckAmount) + (BodyHeight - EyeHeight);
+		var height = (EyeHeight + DuckAmount) + (BodyHeight - EyeHeight);
+		if ( forceduck == 1 ) height = DuckHeight;
 		if ( forceduck == -1 ) height = BodyHeight;
 
 		var mins = new Vector3( -girth, -girth, 0 ) * Entity.Scale;
