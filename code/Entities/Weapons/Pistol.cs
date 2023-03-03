@@ -11,6 +11,7 @@ public class Pistol : Gun
 	public override void PrimaryAttack()
 	{
 		PrimaryAmmo -= 1;
+		(Owner as Player).Ammo.TakeAmmo( AmmoType.Pistol, 1 );
 		ShootBullet( 10, 0.02f );
 		PlaySound( "rust_pistol.shoot" );
 		(Owner as AnimatedEntity)?.SetAnimParameter( "b_attack", true );
