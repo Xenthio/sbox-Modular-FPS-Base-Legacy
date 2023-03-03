@@ -1,5 +1,5 @@
 ﻿using Sandbox;
-
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace MyGame;
@@ -21,6 +21,7 @@ partial class Player : AnimatedEntity
 		Components.Add( new WalkController() );
 		Components.Add( new FirstPersonCamera() );
 		Components.Add( new InventoryComponent() );
+		Components.Add( new AmmoStorageComponent() );
 		Components.Add( new CitizenAnimationComponent() );
 		CreateHull();
 		Tags.Add( "player" );
@@ -38,6 +39,8 @@ partial class Player : AnimatedEntity
 	public CameraComponent CameraController => Components.Get<CameraComponent>();
 	public AnimationComponent AnimationController => Components.Get<AnimationComponent>();
 	public InventoryComponent Inventory => Components.Get<InventoryComponent>();
+	public AmmoStorageComponent AmmoController => Components.Get<AmmoStorageComponent>();
+	public IList<int> Ammo => AmmoController.Ammo;
 
 
 	/// <summary>
