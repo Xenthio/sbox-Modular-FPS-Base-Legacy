@@ -1,5 +1,4 @@
 ﻿using Sandbox;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace MyGame;
@@ -39,8 +38,7 @@ partial class Player : AnimatedEntity
 	public CameraComponent CameraController => Components.Get<CameraComponent>();
 	public AnimationComponent AnimationController => Components.Get<AnimationComponent>();
 	public InventoryComponent Inventory => Components.Get<InventoryComponent>();
-	public AmmoStorageComponent AmmoController => Components.Get<AmmoStorageComponent>();
-	public IList<int> Ammo => AmmoController.Ammo;
+	public AmmoStorageComponent Ammo => Components.Get<AmmoStorageComponent>();
 
 
 	/// <summary>
