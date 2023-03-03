@@ -1,7 +1,7 @@
 ﻿using Sandbox;
 
 namespace MyGame;
-public class Gun : Weapon
+public partial class Gun : Weapon
 {
 	public virtual float PrimaryReloadDelay => 0.0f;
 	public virtual float SecondaryReloadDelay => 0.0f;
@@ -9,8 +9,8 @@ public class Gun : Weapon
 	public virtual int MaxSecondaryAmmo => 0;
 	public virtual AmmoType PrimaryAmmoType => AmmoType.None;
 	public virtual AmmoType SecondaryAmmoType => AmmoType.None;
-	public int PrimaryAmmo { get; set; } = 0;
-	public int SecondaryAmmo { get; set; } = 0;
+	[Net] public int PrimaryAmmo { get; set; } = 0;
+	[Net] public int SecondaryAmmo { get; set; } = 0;
 	bool IsPrimaryReloading => TimeSincePrimaryReload < PrimaryReloadDelay;
 	bool IsSecondaryReloading => TimeSinceSecondaryReload < SecondaryReloadDelay;
 	public override void Spawn()
