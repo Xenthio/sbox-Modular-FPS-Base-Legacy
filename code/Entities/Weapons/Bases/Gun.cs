@@ -7,6 +7,8 @@ public class Gun : Weapon
 	public virtual float SecondaryReloadDelay => 0.0f;
 	public virtual int MaxPrimaryAmmo => 0;
 	public virtual int MaxSecondaryAmmo => 0;
+	public virtual AmmoType PrimaryAmmoType => AmmoType.None;
+	public virtual AmmoType SecondaryAmmoType => AmmoType.None;
 	public int PrimaryAmmo { get; set; } = 0;
 	public int SecondaryAmmo { get; set; } = 0;
 	bool IsPrimaryReloading => TimeSincePrimaryReload < PrimaryReloadDelay;
@@ -14,6 +16,7 @@ public class Gun : Weapon
 	public override void Spawn()
 	{
 		base.Spawn();
+		PrimaryAmmo = MaxPrimaryAmmo;
 	}
 	public override void Simulate( IClient cl )
 	{
@@ -34,8 +37,11 @@ public class Gun : Weapon
 			}
 			else
 			{
-				TimeSincePrimaryReload = 0;
-				ReloadPrimary();
+				if ( CanReloadPrimary() )
+				{
+					TimeSincePrimaryReload = 0;
+					ReloadPrimary();
+				}
 			}
 		}
 		if ( CanSecondaryAttack() && !IsSecondaryReloading )
@@ -50,24 +56,29 @@ public class Gun : Weapon
 			}
 			else
 			{
-				TimeSinceSecondaryReload = 0;
-				ReloadSecondary();
+				if ( CanReloadSecondary() )
+				{
+					TimeSinceSecondaryReload = 0;
+					ReloadSecondary();
+				}
 			}
 		}
 	}
 	public TimeSince TimeSincePrimaryReload;
 	public virtual void ReloadPrimary()
 	{
-		PrimaryAmmo = MaxPrimaryAmmo;
+		var ammo = (Owner as Player).Ammo.AmmoCount( PrimaryAmmoType ).Clamp( 0, MaxPrimaryAmmo - PrimaryAmmo );
+		PrimaryAmmo += ammo;
 	}
 	public TimeSince TimeSinceSecondaryReload;
 	public virtual void ReloadSecondary()
 	{
-		PrimaryAmmo = MaxSecondaryAmmo;
+		var ammo = (Owner as Player).Ammo.AmmoCount( SecondaryAmmoType ).Clamp( 0, MaxSecondaryAmmo - SecondaryAmmo );
+		SecondaryAmmo += ammo;
 	}
 	public virtual bool CanReloadPrimary()
 	{
-		return Input.Pressed( InputButton.Reload ) && PrimaryAmmo != MaxPrimaryAmmo;
+		return Input.Pressed( InputButton.Reload ) && PrimaryAmmo != MaxPrimaryAmmo && (Owner as Player).Ammo.AmmoCount( PrimaryAmmoType ) > 0;
 	}
 	public virtual bool CanReloadSecondary()
 	{
