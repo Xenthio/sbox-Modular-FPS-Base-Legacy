@@ -53,9 +53,7 @@ public class Carriable : AnimatedEntity
 		if ( other is Player ply )
 		{
 			ply.Inventory?.AddItem( this );
-			Log.Info( "Hello!" );
 		}
-		Log.Info( "Hi!" );
 	}
 	public virtual void OnPickup( Entity equipper )
 	{
