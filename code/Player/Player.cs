@@ -11,7 +11,9 @@ partial class Player : AnimatedEntity
 	public override void Spawn()
 	{
 		base.Spawn();
-
+		Components.RemoveAll();
+		LifeState = LifeState.Alive;
+		Health = 100;
 		//
 		// Use a watermelon model
 		//
@@ -102,7 +104,22 @@ partial class Player : AnimatedEntity
 		// if so we should expose that instead, that would be awesome.
 		EnableHitboxes = true;
 	}
-
+	DamageInfo LastDamage;
+	public override void TakeDamage( DamageInfo info )
+	{
+		base.TakeDamage( info );
+		LastDamage = info;
+		if ( Health <= 0 && LifeState == LifeState.Alive )
+		{
+			LifeState = LifeState.Dead;
+			OnKilled();
+		}
+	}
+	public override void OnKilled()
+	{
+		base.OnKilled();
+		BecomeRagdoll( LastDamage.Force, LastDamage.BoneIndex );
+	}
 
 	//---------------------------------------------// 
 
