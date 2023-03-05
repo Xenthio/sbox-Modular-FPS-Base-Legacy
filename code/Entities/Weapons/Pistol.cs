@@ -17,7 +17,7 @@ public class Pistol : Gun
 		(Owner as AnimatedEntity)?.SetAnimParameter( "b_attack", true );
 		if ( Game.IsClient )
 		{
-			ViewModelEntity.SetAnimParameter( "fire", true );
+			ShootEffects();
 		}
 	}
 	public override void ReloadPrimary()

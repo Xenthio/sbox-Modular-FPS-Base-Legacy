@@ -3,7 +3,15 @@
 namespace MyGame;
 public partial class Gun : Weapon
 {
+	public virtual void ShootEffects()
+	{
+		Game.AssertClient();
 
+		Particles.Create( "particles/pistol_muzzleflash.vpcf", EffectEntity, "muzzle" );
+
+		ViewModelEntity?.SetAnimParameter( "fire", true );
+
+	}
 	public virtual void ShootBullet( float damage = 0, float spread = 0, float force = 0 )
 	{
 		Game.SetRandomSeed( Time.Tick );

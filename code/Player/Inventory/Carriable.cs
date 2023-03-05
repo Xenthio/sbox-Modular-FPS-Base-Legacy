@@ -7,6 +7,11 @@ namespace MyGame;
 /// </summary>
 public class Carriable : AnimatedEntity
 {
+
+	/// <summary>
+	/// Utility - return the entity we should be spawning particles from etc
+	/// </summary>
+	public virtual ModelEntity EffectEntity => (ViewModelEntity.IsValid() && IsFirstPersonMode) ? ViewModelEntity : this;
 	public Entity Carrier { get; set; }
 	public virtual string WorldModelPath => null;
 	public virtual string ViewModelPath => null;
