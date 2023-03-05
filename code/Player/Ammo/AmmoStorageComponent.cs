@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace MyGame;
-public partial class AmmoStorageComponent : SimulatedComponent, ISingletonComponent
+public partial class AmmoStorageComponent : EntityComponent<Player>, ISingletonComponent
 {
 	[Net, Local]
 	public IList<int> Ammo { get; set; }

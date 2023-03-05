@@ -21,9 +21,10 @@ partial class Player : AnimatedEntity
 		SetModel( "models/citizen/citizen.vmdl" );
 		Components.Add( new WalkController() );
 		Components.Add( new FirstPersonCamera() );
-		Components.Add( new InventoryComponent() );
 		Components.Add( new AmmoStorageComponent() );
+		Components.Add( new InventoryComponent() );
 		Components.Add( new CitizenAnimationComponent() );
+		Ammo.ClearAmmo();
 		CreateHull();
 		Tags.Add( "player" );
 		EnableDrawing = true;

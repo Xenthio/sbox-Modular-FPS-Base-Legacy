@@ -8,6 +8,7 @@ public class Pistol : Gun
 	public override float PrimaryAttackDelay => 0.1f;
 	public override float PrimaryReloadDelay => 3.0f;
 	public override int MaxPrimaryAmmo => 17;
+	public override AmmoType PrimaryAmmoType => AmmoType.Pistol;
 	public override void PrimaryAttack()
 	{
 		PrimaryAmmo -= 1;
