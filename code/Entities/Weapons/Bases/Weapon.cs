@@ -24,7 +24,7 @@ public partial class Weapon : Carriable
 	}
 	public override void Simulate( IClient cl )
 	{
-		if ( CanReloadPrimary() )
+		if ( CanReloadPrimary() && Input.Pressed( InputButton.Reload ) )
 		{
 			TimeSincePrimaryReload = 0;
 			ReloadPrimary();
@@ -84,7 +84,7 @@ public partial class Weapon : Carriable
 	}
 	public virtual bool CanReloadPrimary()
 	{
-		return Input.Pressed( InputButton.Reload ) && PrimaryAmmo != MaxPrimaryAmmo && (Owner as Player).Ammo.AmmoCount( PrimaryAmmoType ) > 0;
+		return PrimaryAmmo != MaxPrimaryAmmo && (Owner as Player).Ammo.AmmoCount( PrimaryAmmoType ) > 0;
 	}
 	public virtual bool CanReloadSecondary()
 	{
