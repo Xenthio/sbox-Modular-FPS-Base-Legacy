@@ -118,6 +118,8 @@ partial class Player : AnimatedEntity
 		BecomeRagdoll( LastDamage.Force, LastDamage.BoneIndex );
 		EnableAllCollisions = false;
 		EnableDrawing = false;
+		Inventory.DropItem( Inventory.ActiveChild );
+		Inventory.Items.Clear();
 		Components.Add( new NoclipController() );
 	}
 

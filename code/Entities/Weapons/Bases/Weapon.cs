@@ -24,6 +24,7 @@ public partial class Weapon : Carriable
 	}
 	public override void Simulate( IClient cl )
 	{
+		if ( Owner is not Player ) return;
 		if ( CanReloadPrimary() && Input.Pressed( InputButton.Reload ) )
 		{
 			TimeSincePrimaryReload = 0;

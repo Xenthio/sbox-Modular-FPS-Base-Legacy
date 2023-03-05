@@ -22,6 +22,11 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 		}
 		return false;
 	}
+	public bool DropItem( Entity item )
+	{
+		if ( item is Carriable cr1 ) cr1.OnDrop( Entity );
+		return true;
+	}
 	/// <summary>
 	/// Get the item in this slot
 	/// </summary>
