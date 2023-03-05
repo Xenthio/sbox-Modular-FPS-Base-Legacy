@@ -1,4 +1,5 @@
 ﻿using Sandbox;
+using System.Linq;
 
 namespace MyGame;
 /// <summary>
@@ -52,7 +53,20 @@ public class Carriable : AnimatedEntity
 		base.Touch( other );
 		if ( other is Player ply )
 		{
-			ply.Inventory?.AddItem( this );
+			if ( ply.Inventory?.Items.Where( x => x.GetType() == this.GetType() ).Count() <= 0 )
+			{
+
+				ply.Inventory?.AddItem( this );
+			}
+			else
+			{
+				if ( this is Weapon wep )
+				{
+					ply.Ammo?.GiveAmmo( wep.PrimaryAmmoType, wep.PrimaryAmmo );
+					ply.Ammo?.GiveAmmo( wep.SecondaryAmmoType, wep.SecondaryAmmo );
+					wep.Delete();
+				}
+			}
 		}
 	}
 	public virtual void OnPickup( Entity equipper )
