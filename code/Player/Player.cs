@@ -27,6 +27,7 @@ partial class Player : AnimatedEntity
 		Ammo.ClearAmmo();
 		CreateHull();
 		Tags.Add( "player" );
+		EnableAllCollisions = true;
 		EnableDrawing = true;
 		EnableHideInFirstPerson = true;
 		EnableShadowInFirstPerson = true;
@@ -118,8 +119,10 @@ partial class Player : AnimatedEntity
 	}
 	public override void OnKilled()
 	{
-		base.OnKilled();
 		BecomeRagdoll( LastDamage.Force, LastDamage.BoneIndex );
+		EnableAllCollisions = false;
+		EnableDrawing = false;
+		Components.Add( new NoclipController() );
 	}
 
 	//---------------------------------------------// 
