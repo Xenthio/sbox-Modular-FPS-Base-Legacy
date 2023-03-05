@@ -1,6 +1,5 @@
 ﻿using Sandbox;
 using System.Collections.Generic;
-using System.Linq;
 namespace MyGame;
 public partial class InventoryComponent : SimulatedComponent, ISingletonComponent
 {
@@ -13,28 +12,13 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 
 	public bool AddItem( Entity item )
 	{
-		if ( Items.Where( x => x.GetType() == item.GetType() ).Count() <= 0 )
+		if ( Items.Count < MaxItems )
 		{
-			if ( Items.Count < MaxItems )
-			{
-				Items.Add( item );
-				if ( item is Carriable cr1 ) cr1.OnPickup( Entity );
-				ActiveChild = item;
-				ActiveChildInput = item;
-				return true;
-			}
-		}
-		else
-		{
-			if ( Entity is Player ply )
-			{
-				if ( item is Weapon wep )
-				{
-					ply.Ammo?.GiveAmmo( wep.PrimaryAmmoType, wep.PrimaryAmmo );
-					ply.Ammo?.GiveAmmo( wep.SecondaryAmmoType, wep.SecondaryAmmo );
-					wep.Delete();
-				}
-			}
+			Items.Add( item );
+			if ( item is Carriable cr1 ) cr1.OnPickup( Entity );
+			ActiveChild = item;
+			ActiveChildInput = item;
+			return true;
 		}
 		return false;
 	}
