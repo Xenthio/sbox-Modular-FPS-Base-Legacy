@@ -109,16 +109,12 @@ partial class Player : AnimatedEntity
 	DamageInfo LastDamage;
 	public override void TakeDamage( DamageInfo info )
 	{
-		base.TakeDamage( info );
 		LastDamage = info;
-		if ( Health <= 0 && LifeState == LifeState.Alive )
-		{
-			LifeState = LifeState.Dead;
-			OnKilled();
-		}
+		base.TakeDamage( info );
 	}
 	public override void OnKilled()
 	{
+		LifeState = LifeState.Dead;
 		BecomeRagdoll( LastDamage.Force, LastDamage.BoneIndex );
 		EnableAllCollisions = false;
 		EnableDrawing = false;
