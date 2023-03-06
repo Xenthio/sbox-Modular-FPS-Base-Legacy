@@ -7,11 +7,15 @@ public partial class Player
 	// TODO - make ragdolls dissapear after a load of seconds
 	static EntityLimit RagdollLimit = new EntityLimit { MaxTotal = 20 };
 	public ModelEntity Corpse;
-	void BecomeRagdoll( Vector3 force, int forceBone )
+	void BecomeRagdoll( DamageInfo dmg )
 	{
 		// TODO - lets not make everyone write this shit out all the time
 		// maybe a CreateRagdoll<T>() on ModelEntity?
-		var ent = new ModelEntity();
+		var force = dmg.Force;
+		var forceBone = dmg.BoneIndex;
+
+		var ent = new Corpse();
+		ent.KillDamage = dmg;
 		ent.Position = Position;
 		ent.Rotation = Rotation;
 		ent.UsePhysicsCollision = true;

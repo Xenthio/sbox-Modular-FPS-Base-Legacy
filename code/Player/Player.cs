@@ -127,7 +127,7 @@ partial class Player : AnimatedEntity
 	public override void OnKilled()
 	{
 		LifeState = LifeState.Dead;
-		BecomeRagdoll( LastDamage.Force, LastDamage.BoneIndex );
+		BecomeRagdoll( LastDamage );
 		EnableAllCollisions = false;
 		EnableDrawing = false;
 		Inventory.ActiveChild = null;
