@@ -22,10 +22,10 @@ public class FirstPersonCamera : CameraComponent
 		// Update rotation every frame, to keep things smooth  
 
 		pl.EyeRotation = pl.ViewAngles.ToRotation();
-		pl.Rotation = pl.ViewAngles.WithPitch( 0f ).ToRotation();
 
 		Camera.Position = pl.EyePosition;
 		Camera.Rotation = pl.ViewAngles.ToRotation();
+		Camera.Rotation = pl.EyeRotation;
 
 	}
 	public override void BuildInput()
