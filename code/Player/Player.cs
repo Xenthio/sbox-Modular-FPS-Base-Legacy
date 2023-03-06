@@ -24,6 +24,7 @@ partial class Player : AnimatedEntity
 		Components.Add( new AmmoStorageComponent() );
 		Components.Add( new InventoryComponent() );
 		Components.Add( new CitizenAnimationComponent() );
+		Components.Add( new UseComponent() );
 		Ammo.ClearAmmo();
 		CreateHull();
 		Tags.Add( "player" );
@@ -43,6 +44,7 @@ partial class Player : AnimatedEntity
 	public AnimationComponent AnimationController => Components.Get<AnimationComponent>();
 	public InventoryComponent Inventory => Components.Get<InventoryComponent>();
 	public AmmoStorageComponent Ammo => Components.Get<AmmoStorageComponent>();
+	public UseComponent UseKey => Components.Get<UseComponent>();
 
 
 	/// <summary>
