@@ -25,7 +25,6 @@ public class FirstPersonCamera : CameraComponent
 
 		Camera.Position = pl.EyePosition;
 		Camera.Rotation = pl.ViewAngles.ToRotation();
-		Camera.Rotation = pl.EyeRotation;
 
 	}
 	public override void BuildInput()
