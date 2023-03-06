@@ -112,7 +112,17 @@ partial class Player : AnimatedEntity
 	public override void TakeDamage( DamageInfo info )
 	{
 		LastDamage = info;
-		base.TakeDamage( info );
+		LastAttacker = info.Attacker;
+		LastAttackerWeapon = info.Weapon;
+		if ( Health > 0f && LifeState == LifeState.Alive )
+		{
+			Health -= info.Damage;
+			if ( Health <= 0f )
+			{
+				Health = 0f;
+				OnKilled();
+			}
+		}
 	}
 	public override void OnKilled()
 	{
@@ -120,14 +130,12 @@ partial class Player : AnimatedEntity
 		BecomeRagdoll( LastDamage.Force, LastDamage.BoneIndex );
 		EnableAllCollisions = false;
 		EnableDrawing = false;
+		Inventory.ActiveChild = null;
+		Inventory.ActiveChildInput = null;
 		Inventory.DropItem( Inventory.ActiveChild );
 		foreach ( var item in Inventory.Items )
 		{
 			Inventory.DropItem( item );
-		}
-		if ( Inventory.ActiveChild is Weapon wp )
-		{
-			wp.OnActiveEnd();
 		}
 		Inventory.Items.Clear();
 		Components.Add( new NoclipController() );
