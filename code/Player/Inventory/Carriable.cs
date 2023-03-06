@@ -67,9 +67,12 @@ public class Carriable : AnimatedEntity
 			{
 				if ( this is Weapon wep )
 				{
-					ply.Ammo?.GiveAmmo( wep.PrimaryAmmoType, wep.PrimaryAmmo );
-					ply.Ammo?.GiveAmmo( wep.SecondaryAmmoType, wep.SecondaryAmmo );
-					wep.Delete();
+					wep.PrimaryAmmo -= (int)(ply.Ammo?.GiveAmmo( wep.PrimaryAmmoType, wep.PrimaryAmmo ));
+					wep.SecondaryAmmo -= (int)(ply.Ammo?.GiveAmmo( wep.SecondaryAmmoType, wep.SecondaryAmmo ));
+					if ( wep.PrimaryAmmo <= 0 && wep.SecondaryAmmo <= 0 )
+					{
+						wep.Delete();
+					}
 				}
 			}
 		}
