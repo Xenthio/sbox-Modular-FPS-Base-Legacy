@@ -13,6 +13,7 @@ public partial class Weapon : Carriable
 	public virtual int MaxSecondaryAmmo => 0;
 	public virtual AmmoType PrimaryAmmoType => AmmoType.None;
 	public virtual AmmoType SecondaryAmmoType => AmmoType.None;
+	public virtual bool Automatic => false;
 	[Net] public int PrimaryAmmo { get; set; } = 0;
 	[Net] public int SecondaryAmmo { get; set; } = 0;
 	bool IsPrimaryReloading => TimeSincePrimaryReload < PrimaryReloadDelay;
@@ -104,10 +105,10 @@ public partial class Weapon : Carriable
 	}
 	public virtual bool CanPrimaryAttack()
 	{
-		return Input.Pressed( InputButton.PrimaryAttack ) && TimeSincePrimaryAttack >= PrimaryAttackDelay;
+		return (Automatic ? Input.Down( InputButton.PrimaryAttack ) : Input.Pressed( InputButton.PrimaryAttack )) && TimeSincePrimaryAttack >= PrimaryAttackDelay;
 	}
 	public virtual bool CanSecondaryAttack()
 	{
-		return Input.Pressed( InputButton.SecondaryAttack ) && TimeSinceSecondaryAttack >= SecondaryAttackDelay;
+		return (Automatic ? Input.Down( InputButton.SecondaryAttack ) : Input.Pressed( InputButton.SecondaryAttack )) && TimeSinceSecondaryAttack >= SecondaryAttackDelay;
 	}
 }
