@@ -34,7 +34,7 @@ public partial class Weapon : Carriable
 		if ( CanPrimaryAttack() && !IsPrimaryReloading )
 		{
 			TimeSincePrimaryAttack = 0;
-			if ( PrimaryAmmo > 0 )
+			if ( PrimaryAmmo > 0 || MaxPrimaryAmmo == 0 )
 			{
 				using ( LagCompensation() )
 				{
@@ -53,7 +53,7 @@ public partial class Weapon : Carriable
 		if ( CanSecondaryAttack() && !IsSecondaryReloading )
 		{
 			TimeSinceSecondaryAttack = 0;
-			if ( SecondaryAmmo > 0 )
+			if ( SecondaryAmmo > 0 || MaxSecondaryAmmo == 0 )
 			{
 				using ( LagCompensation() )
 				{
