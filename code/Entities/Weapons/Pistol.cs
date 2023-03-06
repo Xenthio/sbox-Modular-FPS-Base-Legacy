@@ -18,6 +18,7 @@ public class Pistol : Gun
 		if ( Game.IsClient )
 		{
 			ShootEffects();
+			DoViewPunch( 1f );
 		}
 	}
 	public override void ReloadPrimary()

@@ -12,6 +12,14 @@ public partial class Gun : Weapon
 		ViewModelEntity?.SetAnimParameter( "fire", true );
 
 	}
+
+	public virtual void DoViewPunch( float punch )
+	{
+		if ( Game.IsClient )
+		{
+			(Owner as Player).ViewAngles += new Angles( -punch, 0, 0 );
+		}
+	}
 	public virtual void ShootBullet( float damage = 0, float spread = 0, float force = 0 )
 	{
 		Game.SetRandomSeed( Time.Tick );
