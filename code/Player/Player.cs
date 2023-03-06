@@ -150,9 +150,9 @@ partial class Player : AnimatedEntity
 	{
 		base.BuildInput();
 		// these are to be done in order and before the simulated components
-		MovementController.BuildInput();
-		CameraController.BuildInput();
-		AnimationController.BuildInput();
+		MovementController?.BuildInput();
+		CameraController?.BuildInput();
+		AnimationController?.BuildInput();
 
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
 		{
@@ -190,9 +190,9 @@ partial class Player : AnimatedEntity
 			}
 		}
 		// these are to be done in order and before the simulated components
-		MovementController.Simulate( cl );
-		CameraController.Simulate( cl );
-		AnimationController.Simulate( cl );
+		MovementController?.Simulate( cl );
+		CameraController?.Simulate( cl );
+		AnimationController?.Simulate( cl );
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
 		{
 			if ( i.Enabled ) i.Simulate( cl );
@@ -206,9 +206,9 @@ partial class Player : AnimatedEntity
 	{
 		base.FrameSimulate( cl );
 		// these are to be done in order and before the simulated components
-		MovementController.FrameSimulate( cl );
-		CameraController.FrameSimulate( cl );
-		AnimationController.FrameSimulate( cl );
+		MovementController?.FrameSimulate( cl );
+		CameraController?.FrameSimulate( cl );
+		AnimationController?.FrameSimulate( cl );
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
 		{
 			if ( i.Enabled ) i.FrameSimulate( cl );
