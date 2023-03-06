@@ -162,13 +162,13 @@ partial class Player : AnimatedEntity
 		}
 		if ( Game.IsClient )
 		{
-			if ( Input.Pressed( InputButton.SlotNext ) )
+			if ( Input.MouseWheel > 0.1 )
 			{
-				Inventory?.SwitchActiveSlot( 1, false );
+				Inventory?.SwitchActiveSlot( 1, true );
 			}
-			if ( Input.Pressed( InputButton.SlotPrev ) )
+			if ( Input.MouseWheel < -0.1 )
 			{
-				Inventory?.SwitchActiveSlot( -1, false );
+				Inventory?.SwitchActiveSlot( -1, true );
 			}
 		}
 		// these are to be done in order and before the simulated components
