@@ -121,6 +121,14 @@ partial class Player : AnimatedEntity
 		EnableAllCollisions = false;
 		EnableDrawing = false;
 		Inventory.DropItem( Inventory.ActiveChild );
+		foreach ( var item in Inventory.Items )
+		{
+			Inventory.DropItem( item );
+		}
+		if ( Inventory.ActiveChild is Weapon wp )
+		{
+			wp.OnActiveEnd();
+		}
 		Inventory.Items.Clear();
 		Components.Add( new NoclipController() );
 	}
