@@ -30,14 +30,8 @@ public class FirstPersonCamera : CameraComponent
 	public override void BuildInput()
 	{
 		var pl = Entity as Player;
-		var look = Input.AnalogLook;
-		if ( pl.ViewAngles.pitch > 90f || pl.ViewAngles.pitch < -90f )
-		{
-			look = look.WithYaw( look.yaw * -1f );
-		}
-		var viewAngles = pl.ViewAngles;
-		viewAngles += look;
-		viewAngles.pitch = viewAngles.pitch.Clamp( -89f, 89f );
-		pl.ViewAngles = viewAngles.Normal;
+		var viewAngles = (pl.ViewAngles + Input.AnalogLook).Normal;
+		pl.ViewAngles = viewAngles.WithPitch( viewAngles.pitch.Clamp( -89f, 89f ) );
+		return;
 	}
 }
