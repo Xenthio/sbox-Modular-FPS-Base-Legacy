@@ -18,6 +18,10 @@ public partial class MyGame : GameManager
 {
 	public MyGame()
 	{
+		if ( Game.IsServer )
+		{
+			_ = new HUDEntity();
+		}
 	}
 
 	/// <summary>

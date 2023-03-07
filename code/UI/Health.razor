@@ -1,0 +1,31 @@
+﻿@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Construct; 
+@using System;
+@namespace MyGame
+<style>
+	.health {
+		position:absolute;
+		bottom:32px;
+		left:32px;
+		gap:16px;
+	} 
+	.seg {
+		font-size: 64px;
+		background-color: black;
+		color: white;
+	}
+</style>
+
+<root class="health">  
+	@if (Game.LocalPawn.LifeState == LifeState.Alive)
+		<div class="seg">@Math.Round(Game.LocalPawn.Health)</div>
+	} 
+</root> 
+
+@code {
+	protected override int BuildHash()
+	{ 
+		return HashCode.Combine(Math.Round(Game.LocalPawn.Health), Game.LocalPawn.LifeState);
+	}
+}
