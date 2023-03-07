@@ -88,7 +88,7 @@ partial class Player : AnimatedEntity
 		);
 	}
 
-	public override Ray AimRay => new Ray( EyePosition, ViewAngles.Forward );
+	public override Ray AimRay => new Ray( EyePosition, EyeRotation.Forward );
 	/// <summary>
 	/// Create a physics hull for this player. The hull stops physics objects and players passing through
 	/// the player. It's basically a big solid box. It also what hits triggers and stuff.
