@@ -150,8 +150,8 @@ partial class Player : AnimatedEntity
 	{
 		base.BuildInput();
 		// these are to be done in order and before the simulated components
-		MovementController?.BuildInput();
 		CameraController?.BuildInput();
+		MovementController?.BuildInput();
 		AnimationController?.BuildInput();
 
 		foreach ( var i in Components.GetAll<SimulatedComponent>() )
