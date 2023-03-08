@@ -3,9 +3,14 @@
 namespace MyGame;
 public partial class Throwable : Carriable
 {
+	public TimeSince TimeSinceClicked;
 	public override void Simulate( IClient cl )
 	{
 		if ( Owner is not Player ) return;
+		if ( PullPin() )
+		{
+			TimeSinceClicked = 0;
+		}
 		if ( WillThrow() )
 		{
 			using ( LagCompensation() )
@@ -21,6 +26,10 @@ public partial class Throwable : Carriable
 				Delete();
 			}
 		}
+	}
+	public virtual bool PullPin()
+	{
+		return Input.Pressed( InputButton.PrimaryAttack );
 	}
 	public virtual bool WillThrow()
 	{
