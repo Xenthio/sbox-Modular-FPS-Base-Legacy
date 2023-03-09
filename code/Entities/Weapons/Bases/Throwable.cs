@@ -3,6 +3,7 @@
 namespace MyGame;
 public partial class Throwable : Carriable
 {
+	[ConVar.Replicated] public static bool sv_infinite_grenade { get; set; } = false;
 	public TimeSince TimeSinceClicked;
 	public override void Simulate( IClient cl )
 	{
@@ -23,7 +24,7 @@ public partial class Throwable : Carriable
 				{
 					ply.Inventory?.Items.Remove( this );
 				}
-				Delete();
+				if ( !sv_infinite_grenade ) Delete();
 			}
 		}
 	}
