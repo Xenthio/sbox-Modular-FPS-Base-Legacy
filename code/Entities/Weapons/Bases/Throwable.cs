@@ -18,13 +18,13 @@ public partial class Throwable : Carriable
 			{
 				Throw();
 			}
-			if ( Game.IsServer )
+			if ( Game.IsServer && !sv_infinite_grenade )
 			{
 				if ( Owner is Player ply )
 				{
 					ply.Inventory?.Items.Remove( this );
 				}
-				if ( !sv_infinite_grenade ) Delete();
+				Delete();
 			}
 		}
 	}
