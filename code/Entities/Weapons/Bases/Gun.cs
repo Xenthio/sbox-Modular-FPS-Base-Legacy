@@ -31,7 +31,6 @@ public partial class Gun : Weapon
 	}
 	public virtual void ViewPunchEffectFrame()
 	{
-		Log.Info( viewpunchmod );
 		if ( viewpunchmod <= -0.1f )
 		{
 			punched = true;
