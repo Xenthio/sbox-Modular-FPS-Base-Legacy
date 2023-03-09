@@ -3,6 +3,8 @@
 namespace MyGame;
 public partial class Gun : Weapon
 {
+	internal float viewpunchmod = 0;
+	bool punched = false;
 	public virtual void ShootEffects()
 	{
 		Game.AssertClient();
@@ -18,7 +20,32 @@ public partial class Gun : Weapon
 		if ( Game.IsClient )
 		{
 			(Owner as Player).ViewAngles += new Angles( -punch, 0, 0 );
+			viewpunchmod = 0.5f;
+			punched = false;
 		}
+	}
+	public override void FrameSimulate( IClient cl )
+	{
+		base.FrameSimulate( cl );
+		ViewPunchEffectFrame();
+	}
+	public virtual void ViewPunchEffectFrame()
+	{
+		Log.Info( viewpunchmod );
+		if ( viewpunchmod <= -0.1f )
+		{
+			punched = true;
+
+		}
+		if ( punched )
+		{
+			viewpunchmod = viewpunchmod.LerpTo( 0, Time.Delta * 28 );
+		}
+		else
+		{
+			viewpunchmod = viewpunchmod.LerpTo( -0.12f, Time.Delta * 48 );
+		}
+		(Owner as Player).ViewAngles += new Angles( -viewpunchmod, 0, 0 );
 	}
 	public virtual void ShootBullet( float damage = 0, float spread = 0, float force = 0 )
 	{

@@ -23,6 +23,10 @@ public partial class Weapon : Carriable
 		base.Spawn();
 		PrimaryAmmo = MaxPrimaryAmmo;
 	}
+	public override void FrameSimulate( IClient cl )
+	{
+		base.FrameSimulate( cl );
+	}
 	public override void Simulate( IClient cl )
 	{
 		if ( Owner is not Player ) return;
