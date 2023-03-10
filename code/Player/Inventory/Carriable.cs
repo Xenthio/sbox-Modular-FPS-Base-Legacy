@@ -108,7 +108,7 @@ public class Carriable : AnimatedEntity
 	}
 	public virtual void OnActiveEnd()
 	{
-		EnableDrawing = false;
+		if ( Parent is Player ) EnableDrawing = false;
 		if ( Game.IsClient )
 		{
 			DestroyViewModel();

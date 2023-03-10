@@ -24,7 +24,18 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 	}
 	public bool DropItem( Entity item )
 	{
-		if ( item is Carriable cr1 ) cr1.OnDrop( Entity );
+		if ( item is Carriable cr1 )
+		{
+			cr1.OnDrop( Entity );
+		}
+		if ( ActiveChild == item )
+		{
+			ActiveChild = null;
+		}
+		if ( ActiveChildInput == item )
+		{
+			ActiveChildInput = null;
+		}
 		return true;
 	}
 	/// <summary>
@@ -97,6 +108,18 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 	public override void Simulate( IClient cl )
 	{
 		base.Simulate( cl );
+
+		// drop weapons
+
+		if ( Input.Pressed( InputButton.Drop ) )
+		{
+			var item = ActiveChild;
+			DropItem( item );
+			item.Velocity = Entity.Rotation.Forward * 200;
+			item.Position = Entity.Position + Entity.Rotation.Forward * 48;
+			item.EnableDrawing = true;
+		}
+
 		if ( ActiveChildInput.IsValid() )
 		{
 			if ( ActiveChildInput.Owner == Entity )
@@ -116,6 +139,7 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 			PreviousActiveChild = ActiveChild;
 			if ( ActiveChild is Carriable cr2 ) cr2.OnActiveStart();
 		}
+
 		ActiveChild?.Simulate( cl );
 	}
 	public override void FrameSimulate( IClient cl )
