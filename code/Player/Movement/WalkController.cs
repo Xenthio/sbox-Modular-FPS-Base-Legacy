@@ -179,8 +179,12 @@ public partial class WalkController : MovementComponent
 			}
 		*/
 
-		// if ( underwater ) do underwater movement
-
+		// if ( underwater ) do underwater movement 
+		if ( Entity.GetWaterLevel() > 0.1 )
+		{
+			WaterSimulate();
+		}
+		else
 		if ( AutoJump ? Input.Down( InputButton.Jump ) : Input.Pressed( InputButton.Jump ) )
 		{
 			CheckJumpButton();
@@ -208,7 +212,18 @@ public partial class WalkController : MovementComponent
 		//
 		WishVelocity = new Vector3( pl.InputDirection.x.Clamp( -1f, 1f ), pl.InputDirection.y.Clamp( -1f, 1f ), 0 );
 		var inSpeed = WishVelocity.Length.Clamp( 0, 1 );
-		WishVelocity *= pl.ViewAngles.WithPitch( 0 ).ToRotation();
+
+		if ( Swimming )
+		{
+
+			WishVelocity *= pl.ViewAngles.ToRotation();
+		}
+		else
+		{
+
+			WishVelocity *= pl.ViewAngles.WithPitch( 0 ).ToRotation();
+		}
+
 
 		if ( !Swimming && !IsTouchingLadder )
 		{
@@ -629,7 +644,85 @@ public partial class WalkController : MovementComponent
 		AddEvent( "jump" );
 
 	}
+	public virtual void WaterSimulate()
+	{
+		if ( Entity.GetWaterLevel() > 0.4 )
+		{
+			CheckWaterJump();
+		}
 
+		// If we are falling again, then we must not trying to jump out of water any more.
+		if ( (Entity.Velocity.z < 0.0f) && IsJumpingFromWater )
+		{
+			WaterJumpTime = 0.0f;
+		}
+
+		// Was jump button pressed?
+		if ( Input.Down( InputButton.Jump ) )
+		{
+			CheckJumpButton();
+		}
+		SetTag( "swimming" );
+	}
+	protected float WaterJumpTime { get; set; }
+	protected Vector3 WaterJumpVelocity { get; set; }
+	protected bool IsJumpingFromWater => WaterJumpTime > 0;
+	protected TimeSince TimeSinceSwimSound { get; set; }
+	protected float LastWaterLevel { get; set; }
+
+	public virtual float WaterJumpHeight => 8;
+	protected void CheckWaterJump()
+	{
+		// Already water jumping.
+		if ( IsJumpingFromWater )
+			return;
+
+		// Don't hop out if we just jumped in
+		// only hop out if we are moving up
+		if ( Entity.Velocity.z < -180 )
+			return;
+
+		// See if we are backing up
+		var flatvelocity = Entity.Velocity.WithZ( 0 );
+
+		// Must be moving
+		var curspeed = flatvelocity.Length;
+		flatvelocity = flatvelocity.Normal;
+
+		// see if near an edge
+		var flatforward = Entity.Rotation.Forward.WithZ( 0 ).Normal;
+
+		// Are we backing into water from steps or something?  If so, don't pop forward
+		if ( curspeed != 0 && Vector3.Dot( flatvelocity, flatforward ) < 0 )
+			return;
+
+		var vecStart = Entity.Position + (mins + maxs) * .5f;
+		var vecEnd = vecStart + flatforward * 24;
+
+		var tr = TraceBBox( vecStart, vecEnd );
+		if ( tr.Fraction == 1 )
+			return;
+
+		vecStart.z = Entity.Position.z + EyeHeight + WaterJumpHeight;
+		vecEnd = vecStart + flatforward * 24;
+		WaterJumpVelocity = tr.Normal * -50;
+
+		tr = TraceBBox( vecStart, vecEnd );
+		if ( tr.Fraction < 1.0 )
+			return;
+
+		// Now trace down to see if we would actually land on a standable surface.
+		vecStart = vecEnd;
+		vecEnd.z -= 1024;
+
+		tr = TraceBBox( vecStart, vecEnd );
+		if ( tr.Fraction < 1 && tr.Normal.z >= 0.7f )
+		{
+			Entity.Velocity = Entity.Velocity.WithZ( 256 );
+			Entity.Tags.Add( "waterjump" );
+			WaterJumpTime = 2000;
+		}
+	}
 	public virtual void AirMove()
 	{
 		var wishdir = WishVelocity.Normal;
