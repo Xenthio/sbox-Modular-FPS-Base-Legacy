@@ -36,6 +36,7 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 		{
 			ActiveChildInput = null;
 		}
+		Items.Remove( item );
 		return true;
 	}
 	/// <summary>
@@ -111,12 +112,12 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 
 		// drop weapons
 
-		if ( Input.Pressed( InputButton.Drop ) )
+		if ( Input.Pressed( InputButton.Drop ) && ActiveChild != null )
 		{
 			var item = ActiveChild;
 			DropItem( item );
-			item.Velocity = Entity.Rotation.Forward * 200;
-			item.Position = Entity.Position + Entity.Rotation.Forward * 48;
+			item.Velocity = Entity.AimRay.Forward * 200;
+			item.Position = Entity.AimRay.Position + Entity.AimRay.Forward * 48;
 			item.EnableDrawing = true;
 		}
 
