@@ -34,15 +34,17 @@ partial class Player : AnimatedEntity
 		EnableTouch = true;
 
 		MoveToSpawnpoint();
+		Event.Run( "Player.Spawn" );
 	}
 
 	/// <summary>
-	/// Respawn this player
+	/// Respawn this player.
 	/// </summary>
 	/// 
 	public virtual void Respawn()
 	{
 		Spawn();
+		Event.Run( "Player.Respawn" );
 	}
 
 	public virtual void MoveToSpawnpoint()
@@ -149,6 +151,7 @@ partial class Player : AnimatedEntity
 				OnKilled();
 			}
 		}
+		Event.Run( "Player.TakeDamage" );
 	}
 	public override void OnKilled()
 	{
@@ -165,6 +168,7 @@ partial class Player : AnimatedEntity
 		}
 		Inventory.Items.Clear();
 		Components.Add( new NoclipController() );
+		Event.Run( "Player.OnKilled" );
 	}
 
 	//---------------------------------------------// 
