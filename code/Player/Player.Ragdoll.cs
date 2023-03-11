@@ -16,6 +16,7 @@ public partial class Player
 
 		var ent = new Corpse();
 		ent.KillDamage = dmg;
+		ent.OwnerClient = Client;
 		ent.Position = Position;
 		ent.Rotation = Rotation;
 		ent.UsePhysicsCollision = true;
