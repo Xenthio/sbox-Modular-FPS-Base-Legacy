@@ -533,7 +533,7 @@ public partial class WalkController : MovementComponent
 	public virtual void TryUnDuck()
 	{
 		UpdateBBox( -1 );
-		var pm = TraceBBox( Entity.Position, Entity.Position, BodyHeight / 2 );
+		var pm = TraceBBox( Entity.Position, Entity.Position, DuckHeight );
 		if ( pm.StartedSolid )
 		{
 			UpdateBBox();
