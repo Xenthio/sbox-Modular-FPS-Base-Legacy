@@ -151,7 +151,7 @@ partial class Player : AnimatedEntity
 				OnKilled();
 			}
 		}
-		Event.Run( "Player.TakeDamage" );
+		Event.Run( "Player.TakeDamage", info );
 	}
 	public override void OnKilled()
 	{
