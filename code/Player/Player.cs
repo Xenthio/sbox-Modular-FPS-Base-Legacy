@@ -151,7 +151,7 @@ partial class Player : AnimatedEntity
 				OnKilled();
 			}
 		}
-		Event.Run( "Player.TakeDamage", info );
+		Event.Run( "Player.TakeDamage", info, this );
 	}
 	public override void OnKilled()
 	{
@@ -168,7 +168,7 @@ partial class Player : AnimatedEntity
 		}
 		Inventory.Items.Clear();
 		Components.Add( new NoclipController() );
-		Event.Run( "Player.OnKilled" );
+		Event.Run( "Player.OnKilled", this );
 	}
 
 	//---------------------------------------------// 
