@@ -16,10 +16,7 @@ partial class Player : AnimatedEntity
 		Components.RemoveAll();
 		LifeState = LifeState.Alive;
 		Health = 100;
-		//
-		// Use a watermelon model
-		//
-		//SetModel( "models/sbox_props/watermelon/watermelon.vmdl" );
+
 		SetModel( "models/citizen/citizen.vmdl" );
 		Components.Add( new WalkController() );
 		Components.Add( new FirstPersonCamera() );
