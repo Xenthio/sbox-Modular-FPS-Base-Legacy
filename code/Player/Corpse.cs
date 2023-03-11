@@ -4,6 +4,8 @@ namespace MyGame;
 
 public partial class Corpse : ModelEntity
 {
-	[Net] public DamageInfo KillDamage { get; set; }
+	public DamageInfo KillDamage { get; set; }
+	[Net] public IClient Attacker { get; set; }
+	[Net] public IClient Weapon { get; set; }
 	[Net] public IClient OwnerClient { get; set; }
 }
