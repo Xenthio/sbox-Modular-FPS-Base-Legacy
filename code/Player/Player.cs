@@ -1,5 +1,7 @@
 ﻿using Sandbox;
+using System;
 using System.ComponentModel;
+using System.Linq;
 
 namespace MyGame;
 
@@ -33,8 +35,35 @@ partial class Player : AnimatedEntity
 		EnableHideInFirstPerson = true;
 		EnableShadowInFirstPerson = true;
 		EnableTouch = true;
+
+		MoveToSpawnpoint();
 	}
 
+	/// <summary>
+	/// Respawn this player
+	/// </summary>
+	/// 
+	public virtual void Respawn()
+	{
+		Spawn();
+	}
+
+	public virtual void MoveToSpawnpoint()
+	{
+		// Get all of the spawnpoints
+		var spawnpoints = Entity.All.OfType<SpawnPoint>();
+
+		// chose a random one
+		var randomSpawnPoint = spawnpoints.OrderBy( x => Guid.NewGuid() ).FirstOrDefault();
+
+		// if it exists, place the pawn there
+		if ( randomSpawnPoint != null )
+		{
+			var tx = randomSpawnPoint.Transform;
+			tx.Position = tx.Position + Vector3.Up * 50.0f; // raise it up
+			Transform = tx;
+		}
+	}
 	// An example BuildInput method within a player's Pawn class.
 	[ClientInput] public Vector3 InputDirection { get; set; }
 	[ClientInput] public Angles ViewAngles { get; set; }

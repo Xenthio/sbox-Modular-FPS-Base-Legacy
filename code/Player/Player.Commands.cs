@@ -27,4 +27,12 @@ public partial class Player
 			basePlayer.TakeDamage( new DamageInfo { Damage = basePlayer.Health * 99 } );
 		}
 	}
+	[ConCmd.Admin( "respawn" )]
+	static void DoPlayerRespawn()
+	{
+		if ( ConsoleSystem.Caller.Pawn is Player basePlayer )
+		{
+			basePlayer.Respawn();
+		}
+	}
 }
