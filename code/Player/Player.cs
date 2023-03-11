@@ -34,7 +34,7 @@ partial class Player : AnimatedEntity
 		EnableTouch = true;
 
 		MoveToSpawnpoint();
-		Event.Run( "Player.Spawn" );
+		Event.Run( "Player.Spawn", this );
 	}
 
 	/// <summary>
@@ -44,7 +44,7 @@ partial class Player : AnimatedEntity
 	public virtual void Respawn()
 	{
 		Spawn();
-		Event.Run( "Player.Respawn" );
+		Event.Run( "Player.Respawn", this );
 	}
 
 	public virtual void MoveToSpawnpoint()
