@@ -1019,7 +1019,7 @@ public partial class WalkController : MovementComponent
 
 		var ply = Entity as Player;
 		var worldTrnsView = Entity.GroundEntity.Transform.ToWorld( GroundTransformViewAngles.Value );
-		ply.ViewAngles -= (PreviousViewAngles.Value - worldTrnsView.Rotation.Angles()).WithPitch( 0 ).WithRoll( 0 );
+		ply.ViewAngles -= (PreviousViewAngles.Value.ToRotation() * worldTrnsView.Rotation.Inverse).Angles().WithPitch( 0 ).WithRoll( 0 );
 	}
 	void SaveGroundAngles()
 	{
