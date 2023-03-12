@@ -13,6 +13,7 @@ partial class Player : AnimatedEntity
 	public override void Spawn()
 	{
 		base.Spawn();
+		Velocity = Vector3.Zero;
 		Components.RemoveAll();
 		LifeState = LifeState.Alive;
 		Health = 100;
