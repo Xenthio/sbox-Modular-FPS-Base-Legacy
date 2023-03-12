@@ -12,6 +12,7 @@ partial class Player : AnimatedEntity
 	/// </summary>
 	public override void Spawn()
 	{
+		Event.Run( "Player.PreSpawn", this );
 		base.Spawn();
 		Velocity = Vector3.Zero;
 		Components.RemoveAll();
@@ -35,7 +36,7 @@ partial class Player : AnimatedEntity
 		EnableTouch = true;
 
 		MoveToSpawnpoint();
-		Event.Run( "Player.Spawn", this );
+		Event.Run( "Player.PostSpawn", this );
 	}
 
 	/// <summary>
@@ -44,8 +45,9 @@ partial class Player : AnimatedEntity
 	/// 
 	public virtual void Respawn()
 	{
+		Event.Run( "Player.PreRespawn", this );
 		Spawn();
-		Event.Run( "Player.Respawn", this );
+		Event.Run( "Player.PostRespawn", this );
 	}
 
 	public virtual void MoveToSpawnpoint()
@@ -140,6 +142,7 @@ partial class Player : AnimatedEntity
 	DamageInfo LastDamage;
 	public override void TakeDamage( DamageInfo info )
 	{
+		Event.Run( "Player.PreTakeDamage", info, this );
 		LastDamage = info;
 		LastAttacker = info.Attacker;
 		LastAttackerWeapon = info.Weapon;
@@ -152,10 +155,11 @@ partial class Player : AnimatedEntity
 				OnKilled();
 			}
 		}
-		Event.Run( "Player.TakeDamage", info, this );
+		Event.Run( "Player.PostTakeDamage", info, this );
 	}
 	public override void OnKilled()
 	{
+		Event.Run( "Player.PreOnKilled", this );
 		LifeState = LifeState.Dead;
 		BecomeRagdoll( LastDamage );
 
@@ -172,8 +176,8 @@ partial class Player : AnimatedEntity
 			}
 			Inventory.Items.Clear();
 			Components.Add( new NoclipController() );
-			Event.Run( "Player.OnKilled", this );
 		}
+		Event.Run( "Player.PostOnKilled", this );
 	}
 
 	//---------------------------------------------// 
