@@ -165,7 +165,7 @@ partial class Player : AnimatedEntity
 			EnableAllCollisions = false;
 			EnableDrawing = false;
 			Inventory.DropItem( Inventory.ActiveChild );
-			foreach ( var item in Inventory.Items )
+			foreach ( var item in Inventory.Items.ToList() )
 			{
 				Inventory.DropItem( item );
 			}
