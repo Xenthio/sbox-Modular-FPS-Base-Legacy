@@ -31,6 +31,7 @@ public partial class Gun : Weapon
 	}
 	public virtual void ViewPunchEffectFrame()
 	{
+		if ( Owner.LifeState != LifeState.Alive ) return;
 		if ( viewpunchmod <= -0.1f )
 		{
 			punched = true;
