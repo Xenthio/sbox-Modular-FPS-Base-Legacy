@@ -157,18 +157,22 @@ partial class Player : AnimatedEntity
 	{
 		LifeState = LifeState.Dead;
 		BecomeRagdoll( LastDamage );
-		EnableAllCollisions = false;
-		EnableDrawing = false;
+
 		Inventory.ActiveChild = null;
 		Inventory.ActiveChildInput = null;
-		Inventory.DropItem( Inventory.ActiveChild );
-		foreach ( var item in Inventory.Items )
+		if ( Game.IsServer )
 		{
-			Inventory.DropItem( item );
+			EnableAllCollisions = false;
+			EnableDrawing = false;
+			Inventory.DropItem( Inventory.ActiveChild );
+			foreach ( var item in Inventory.Items )
+			{
+				Inventory.DropItem( item );
+			}
+			Inventory.Items.Clear();
+			Components.Add( new NoclipController() );
+			Event.Run( "Player.OnKilled", this );
 		}
-		Inventory.Items.Clear();
-		Components.Add( new NoclipController() );
-		Event.Run( "Player.OnKilled", this );
 	}
 
 	//---------------------------------------------// 
