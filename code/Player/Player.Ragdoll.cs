@@ -29,6 +29,7 @@ public partial class Player
 		ent.SetupPhysicsFromModel( PhysicsMotionType.Dynamic );
 		ent.CopyBonesFrom( this );
 		ent.SetRagdollVelocityFrom( this );
+		ent.PhysicsGroup.AddVelocity( Velocity );
 
 		// Copy the clothes over
 		foreach ( var child in Children )
