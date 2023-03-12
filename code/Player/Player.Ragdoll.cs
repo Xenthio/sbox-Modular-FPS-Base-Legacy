@@ -6,7 +6,7 @@ public partial class Player
 	// TODO - make ragdolls one per entity
 	// TODO - make ragdolls dissapear after a load of seconds
 	static EntityLimit RagdollLimit = new EntityLimit { MaxTotal = 20 };
-	public ModelEntity Corpse;
+	[Net] public ModelEntity Corpse { get; set; }
 	void BecomeRagdoll( DamageInfo dmg )
 	{
 		if ( Game.IsClient ) return;
