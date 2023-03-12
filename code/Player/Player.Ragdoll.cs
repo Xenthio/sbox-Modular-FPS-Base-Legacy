@@ -9,6 +9,7 @@ public partial class Player
 	public ModelEntity Corpse;
 	void BecomeRagdoll( DamageInfo dmg )
 	{
+		if ( Game.IsClient ) return;
 		// TODO - lets not make everyone write this shit out all the time
 		// maybe a CreateRagdoll<T>() on ModelEntity?
 		var force = dmg.Force;
