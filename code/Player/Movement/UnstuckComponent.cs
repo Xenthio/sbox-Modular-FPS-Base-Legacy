@@ -21,6 +21,7 @@ public class UnstuckComponent : EntityComponent
 		}
 		if ( Entity is Player player )
 		{
+			if ( player.MovementController.HasTag( "noclip" ) ) return false;
 			//if ( player.DoUnstick != true )
 			//{
 			//	return false;
