@@ -68,7 +68,7 @@ public class UnstuckComponent : EntityComponent<Player>
 				{
 					var worldTrns = result.Entity.Transform.ToWorld( PreviousEntityTransformLocal.Value );
 					pos = worldTrns.Position;
-					var modifier = (((Entity.Position - worldTrns.Position) * -1) * Time.Delta)
+					var modifier = (((Entity.Position - worldTrns.Position) * -2) * Time.Delta)
 								+ ((((Entity.Position - worldTrns.Position) * -1) * Time.Delta) * ((float)i / 5.0f));
 					pos += modifier;
 					vel = modifier / Time.Delta;
