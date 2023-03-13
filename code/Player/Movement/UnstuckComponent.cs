@@ -2,13 +2,21 @@
 
 using Sandbox;
 namespace MyGame;
-public class UnstuckComponent : EntityComponent
+public class UnstuckComponent : EntityComponent<Player>
 {
 	public bool Debug = false;
 	public bool IsActive; // replicate
 
 	internal int StuckTries = 0;
-	[Event.Tick.Server]
+	public void Simulate( IClient cl )
+	{
+		TestAndFix();
+	}
+
+	Entity PreviousEntity { get; set; }
+	Transform? PreviousEntityTransform { get; set; }
+	Transform? PreviousEntityTransformLocal { get; set; }
+	//[Event.Tick.Server]
 	public virtual bool TestAndFix()
 	{
 		var result = TraceBBox( Entity.Position, Entity.Position );
@@ -17,6 +25,9 @@ public class UnstuckComponent : EntityComponent
 		if ( !result.StartedSolid )
 		{
 			StuckTries = 0;
+			PreviousEntity = null;
+			PreviousEntityTransform = null;
+			PreviousEntityTransformLocal = null;
 			return false;
 		}
 		if ( Entity is Player player )
@@ -36,23 +47,33 @@ public class UnstuckComponent : EntityComponent
 			}
 		}
 
-		//
-		// Client can't jiggle its way out, needs to wait for
-		// server correction to come
-		//
-		if ( Game.IsClient )
-			return true;
 
-		int AttemptsPerTick = 20;
+		int AttemptsPerTick = 1500;
 
 		for ( int i = 0; i < AttemptsPerTick; i++ )
 		{
 			var pos = Entity.Position + Vector3.Random.Normal * (((float)StuckTries) / 2.0f);
-
-			// First try the up direction for moving platforms
+			var vel = Vector3.Zero;
+			// First try the velocity direction for moving platforms
 			if ( i == 0 )
 			{
-				pos = Entity.Position + Vector3.Up * 5;
+				pos = Entity.Position + (result.Entity.Velocity * Time.Delta);
+				vel = result.Entity.Velocity;
+			}
+			else
+			// do more funky stuff for moving platforms
+			if ( result.Entity.Transform != PreviousEntityTransform && result.Entity == PreviousEntity )
+			{
+				if ( i >= 1 && i <= 1024 )
+				{
+
+					var worldTrns = result.Entity.Transform.ToWorld( PreviousEntityTransformLocal.Value );
+					pos = worldTrns.Position;
+					var modifier = (((Entity.Position - worldTrns.Position) * -1) * Time.Delta)
+								+ ((((Entity.Position - worldTrns.Position) * -1) * Time.Delta) * ((float)i / 5.0f));
+					pos += modifier;
+					vel = modifier / Time.Delta;
+				}
 			}
 
 			result = TraceBBox( pos, pos );
@@ -66,6 +87,10 @@ public class UnstuckComponent : EntityComponent
 				}
 
 				Entity.Position = pos;
+				Entity.Velocity += vel;
+				PreviousEntity = null;
+				PreviousEntityTransform = null;
+				PreviousEntityTransformLocal = null;
 				return false;
 			}
 			else
@@ -78,9 +103,61 @@ public class UnstuckComponent : EntityComponent
 		}
 
 		StuckTries++;
-
+		PreviousEntity = result.Entity;
+		PreviousEntityTransform = result.Entity.Transform;
+		PreviousEntityTransformLocal = result.Entity.Transform.ToLocal( Entity.Transform );
 		return true;
 	}
+	public void FrameSimulate( IClient cl )
+	{
+		//doAnglestuff();
+	}
+
+	/*
+	void doAnglestuff() {
+		var result = TraceBBox( Entity.Position, Entity.Position );
+		// Not stuck, we cool
+		if ( !result.StartedSolid )
+		{
+			GroundTransformViewAngles = null;
+			PreviousViewAngles = null;
+			FramePreviousEntity = null;
+			return;
+		}
+		if ( result.Entity.Transform != GroundTransformViewAngles && result.Entity == FramePreviousEntity )
+		{
+			RestoreAngles( result );
+		}
+		result = TraceBBox( Entity.Position, Entity.Position );
+		SaveAngles( result );
+	}
+	public Entity FramePreviousEntity { get; set; }
+	public Transform? GroundTransformViewAngles { get; set; }
+	public Angles? PreviousViewAngles { get; set; }
+	void RestoreAngles( TraceResult result )
+	{
+		if ( result.Entity == null || result.Entity.IsWorld || GroundTransformViewAngles == null || PreviousViewAngles == null )
+			return;
+
+		var ply = Entity as Player;
+		var worldTrnsView = result.Entity.Transform.ToWorld( GroundTransformViewAngles.Value );
+		ply.ViewAngles -= (PreviousViewAngles.Value.ToRotation() * worldTrnsView.Rotation.Inverse).Angles().WithPitch( 0 ).WithRoll( 0 );
+	}
+	void SaveAngles( TraceResult result )
+	{
+
+		if ( result.Entity == null || result.Entity.IsWorld )
+		{
+			GroundTransformViewAngles = null;
+			return;
+		}
+
+		var ply = Entity as Player;
+		GroundTransformViewAngles = result.Entity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
+		PreviousViewAngles = ply.ViewAngles;
+		FramePreviousEntity = result.Entity;
+	}
+	*/
 	// Duck body height 32
 	// Eye Height 64
 	// Duck Eye Height 28

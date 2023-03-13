@@ -78,6 +78,7 @@ partial class Player : AnimatedEntity
 	public InventoryComponent Inventory => Components.Get<InventoryComponent>();
 	public AmmoStorageComponent Ammo => Components.Get<AmmoStorageComponent>();
 	public UseComponent UseKey => Components.Get<UseComponent>();
+	public UnstuckComponent UnstuckController => Components.Get<UnstuckComponent>();
 
 
 	/// <summary>
@@ -231,6 +232,7 @@ partial class Player : AnimatedEntity
 			}
 		}
 		// these are to be done in order and before the simulated components
+		UnstuckController?.Simulate( cl );
 		MovementController?.Simulate( cl );
 		CameraController?.Simulate( cl );
 		AnimationController?.Simulate( cl );
@@ -247,6 +249,7 @@ partial class Player : AnimatedEntity
 	{
 		base.FrameSimulate( cl );
 		// these are to be done in order and before the simulated components
+		UnstuckController?.FrameSimulate( cl );
 		MovementController?.FrameSimulate( cl );
 		CameraController?.FrameSimulate( cl );
 		AnimationController?.FrameSimulate( cl );
