@@ -66,7 +66,6 @@ public class UnstuckComponent : EntityComponent<Player>
 			{
 				if ( i >= 1 && i <= 1024 )
 				{
-
 					var worldTrns = result.Entity.Transform.ToWorld( PreviousEntityTransformLocal.Value );
 					pos = worldTrns.Position;
 					var modifier = (((Entity.Position - worldTrns.Position) * -1) * Time.Delta)
@@ -175,6 +174,13 @@ public class UnstuckComponent : EntityComponent<Player>
 	/// </summary>
 	public virtual TraceResult TraceBBox( Vector3 start, Vector3 end, float liftFeet = 0.0f )
 	{
+		if ( Entity is Player ply )
+		{
+			if ( ply.MovementController is WalkController walk )
+			{
+				return TraceBBox( start, end, walk.mins, walk.maxs, liftFeet );
+			}
+		}
 		return TraceBBox( start, end, (Entity as Player).CollisionBounds.Mins, (Entity as Player).CollisionBounds.Maxs, liftFeet );
 	}
 

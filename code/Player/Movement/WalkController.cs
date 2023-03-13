@@ -58,8 +58,8 @@ public partial class WalkController : MovementComponent
 	// Eye Height 64
 	// Duck Eye Height 28
 
-	protected Vector3 mins;
-	protected Vector3 maxs;
+	public Vector3 mins;
+	public Vector3 maxs;
 
 	/// <summary>
 	/// Any bbox traces we do will be offset by this amount.
