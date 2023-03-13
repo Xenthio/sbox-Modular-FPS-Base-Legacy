@@ -27,6 +27,7 @@ partial class Player : AnimatedEntity
 		Components.Add( new CitizenAnimationComponent() );
 		Components.Add( new UseComponent() );
 		Components.Add( new FallDamageComponent() );
+		Components.Add( new UnstuckComponent() );
 		Ammo.ClearAmmo();
 		CreateHull();
 		Tags.Add( "player" );
