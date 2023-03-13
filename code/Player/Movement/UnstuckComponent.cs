@@ -48,11 +48,11 @@ public class UnstuckComponent : EntityComponent<Player>
 		}
 
 
-		int AttemptsPerTick = 1500;
+		int AttemptsPerTick = 1024;
 
 		for ( int i = 0; i < AttemptsPerTick; i++ )
 		{
-			var pos = Entity.Position + Vector3.Random.Normal * (((float)StuckTries) / 2.0f);
+			var pos = Entity.Position + Vector3.Random.Normal * (((float)StuckTries) / 1.0f);
 			var vel = Vector3.Zero;
 			// First try the velocity direction for moving platforms
 			if ( i == 0 )
@@ -64,7 +64,7 @@ public class UnstuckComponent : EntityComponent<Player>
 			// do more funky stuff for moving platforms
 			if ( result.Entity.Transform != PreviousEntityTransform && result.Entity == PreviousEntity )
 			{
-				if ( i >= 1 && i <= 1024 )
+				if ( i >= 1 && i <= 512 )
 				{
 					var worldTrns = result.Entity.Transform.ToWorld( PreviousEntityTransformLocal.Value );
 					pos = worldTrns.Position;
