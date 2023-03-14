@@ -62,7 +62,7 @@ public partial class Gun : Weapon
 				{
 					if ( tr.Hitbox.HasTag( "head" ) )
 						damage *= HeadshotMultiplier;
-					tr.Entity.TakeDamage( DamageInfo.FromBullet( tr.HitPosition, forward * force, damage ) );
+					tr.Entity.TakeDamage( DamageInfo.FromBullet( tr.HitPosition, forward * force, damage ).WithWeapon( this ).WithAttacker( Owner ) );
 				}
 			}
 		}
