@@ -47,18 +47,23 @@ public partial class Gun : Weapon
 		}
 		(Owner as Player).ViewAngles += new Angles( -viewpunchmod, 0, 0 );
 	}
-	public virtual void ShootBullet( float damage = 0, float spread = 0, float force = 0 )
+	public virtual void ShootBullet( float damage = 0, float spread = 0, float force = 0, int count = 1 )
 	{
-		Game.SetRandomSeed( Time.Tick );
-		var forward = Owner.AimRay.Forward;
-		forward += Vector3.Random * spread;
-		var tr = Trace.Ray( Owner.AimRay.Position, Owner.AimRay.Position + (forward * 65565) ).UseHitboxes().Ignore( Owner ).Run();
-		if ( tr.Hit )
+		for ( int i = 0; i < count; i++ )
 		{
-			tr.Surface.DoBulletImpact( tr );
-			if ( tr.Entity.IsValid() )
+			Game.SetRandomSeed( Time.Tick + i );
+			var forward = Owner.AimRay.Forward;
+			forward += Vector3.Random * spread;
+			var tr = Trace.Ray( Owner.AimRay.Position, Owner.AimRay.Position + (forward * 65565) ).UseHitboxes().Ignore( Owner ).Run();
+			if ( tr.Hit )
 			{
-				tr.Entity.TakeDamage( DamageInfo.FromBullet( tr.HitPosition, forward * force, damage ) );
+				tr.Surface.DoBulletImpact( tr );
+				if ( tr.Entity.IsValid() )
+				{
+					if ( tr.Hitbox.HasTag( "head" ) )
+						damage *= HeadshotMultiplier;
+					tr.Entity.TakeDamage( DamageInfo.FromBullet( tr.HitPosition, forward * force, damage ) );
+				}
 			}
 		}
 	}
