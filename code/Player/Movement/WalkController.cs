@@ -119,7 +119,7 @@ public partial class WalkController : MovementComponent
 		Tags?.Clear();
 
 		pl.EyeLocalPosition = Vector3.Up * (EyeHeight * pl.Scale);
-
+		pl.EyeRotation = pl.ViewAngles.ToRotation();
 
 
 		CheckDuck();

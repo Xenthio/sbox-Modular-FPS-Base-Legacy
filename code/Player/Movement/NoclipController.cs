@@ -22,6 +22,7 @@ public partial class NoclipController : MovementComponent
 		Tags?.Clear();
 
 		pl.EyeLocalPosition = Vector3.Up * (EyeHeight * pl.Scale);
+		pl.EyeRotation = pl.ViewAngles.ToRotation();
 
 		var fwd = pl.InputDirection.x.Clamp( -1f, 1f );
 		var left = pl.InputDirection.y.Clamp( -1f, 1f );
