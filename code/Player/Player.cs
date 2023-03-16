@@ -258,4 +258,20 @@ partial class Player : AnimatedEntity
 			if ( i.Enabled ) i.FrameSimulate( cl );
 		}
 	}
+	TimeSince timeSinceLastFootstep = 0;
+	public override void OnAnimEventFootstep( Vector3 position, int foot, float volume )
+	{
+		if ( LifeState != LifeState.Alive )
+			return;
+
+		if ( !Game.IsServer )
+			return;
+
+		if ( timeSinceLastFootstep < 0.2f )
+			return;
+		var tr = Trace.Ray( position, position + Vector3.Down ).Radius( 1 ).Ignore( this ).Run();
+		if ( !tr.Hit ) return;
+		timeSinceLastFootstep = 0;
+		tr.Surface.DoFootstep( this, tr, foot, 3 );
+	}
 }
