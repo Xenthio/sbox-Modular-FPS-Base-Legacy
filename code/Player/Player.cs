@@ -270,7 +270,7 @@ partial class Player : AnimatedEntity
 		if ( timeSinceLastFootstep < 0.2f )
 			return;
 		volume *= FootstepVolume();
-		var tr = Trace.Ray( position, position + Vector3.Down ).Radius( 1 ).Ignore( this ).Run();
+		var tr = Trace.Ray( position, position + Vector3.Down * 20 ).Radius( 1 ).Ignore( this ).Run();
 		if ( !tr.Hit ) return;
 		timeSinceLastFootstep = 0;
 		tr.Surface.DoFootstep( this, tr, foot, volume * 10 );
