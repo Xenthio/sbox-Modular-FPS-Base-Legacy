@@ -21,7 +21,7 @@ public partial class Melee : Weapon
 			tr.Surface.DoBulletImpact( tr );
 			if ( tr.Entity.IsValid() )
 			{
-				tr.Entity.TakeDamage( DamageInfo.FromBullet( tr.HitPosition, forward * force, damage ) );
+				tr.Entity.TakeDamage( DamageInfo.FromBullet( tr.HitPosition, forward * force, damage ).WithWeapon( this ).WithAttacker( Owner ) );
 			}
 		}
 	}
