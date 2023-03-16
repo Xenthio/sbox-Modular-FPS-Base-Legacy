@@ -11,13 +11,7 @@ public class CitizenAnimationComponent : AnimationComponent
 		// where should we be rotated to
 		var turnSpeed = 0.02f;
 
-		Rotation rotation;
-
-		// If we're a bot, spin us around 180 degrees.
-		if ( ply.Client.IsBot )
-			rotation = ply.ViewAngles.WithYaw( ply.ViewAngles.yaw + 180f ).ToRotation();
-		else
-			rotation = ply.ViewAngles.ToRotation();
+		Rotation rotation = ply.ViewAngles.ToRotation();
 
 		var idealRotation = Rotation.LookAt( rotation.Forward.WithZ( 0 ), Vector3.Up );
 		ply.Rotation = Rotation.Slerp( ply.Rotation, idealRotation, ply.MovementController.WishVelocity.Length * Time.Delta * turnSpeed );

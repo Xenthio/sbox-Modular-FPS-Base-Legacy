@@ -120,11 +120,6 @@ public partial class WalkController : MovementComponent
 
 		pl.EyeLocalPosition = Vector3.Up * (EyeHeight * pl.Scale);
 
-		// If we're a bot, spin us around 180 degrees.
-		if ( pl.Client.IsBot )
-			pl.EyeRotation = pl.ViewAngles.WithYaw( pl.ViewAngles.yaw + 180f ).ToRotation();
-		else
-			pl.EyeRotation = pl.ViewAngles.ToRotation();
 
 
 		CheckDuck();

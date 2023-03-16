@@ -22,11 +22,6 @@ public partial class NoclipController : MovementComponent
 		Tags?.Clear();
 
 		pl.EyeLocalPosition = Vector3.Up * (EyeHeight * pl.Scale);
-		// If we're a bot, spin us around 180 degrees.
-		if ( pl.Client.IsBot )
-			pl.EyeRotation = pl.ViewAngles.WithYaw( pl.ViewAngles.yaw + 180f ).ToRotation();
-		else
-			pl.EyeRotation = pl.ViewAngles.ToRotation();
 
 		var fwd = pl.InputDirection.x.Clamp( -1f, 1f );
 		var left = pl.InputDirection.y.Clamp( -1f, 1f );
