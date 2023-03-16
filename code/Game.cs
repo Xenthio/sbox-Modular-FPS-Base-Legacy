@@ -32,5 +32,7 @@ public partial class MyGame : GameManager
 		// Create a player for this client to play with
 		var pawn = new Player();
 		client.Pawn = pawn;
+		pawn.UpdateClothes( client );
+		pawn.Clothing.DressEntity( pawn );
 	}
 }
