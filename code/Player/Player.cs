@@ -274,4 +274,13 @@ partial class Player : AnimatedEntity
 		timeSinceLastFootstep = 0;
 		tr.Surface.DoFootstep( this, tr, foot, volume * 10 );
 	}
+
+	public virtual float FootstepVolume()
+	{
+		if ( MovementController is WalkController wlk )
+		{
+			if ( wlk.IsDucking ) return 0.3f;
+		}
+		return 1;
+	}
 }
