@@ -36,6 +36,7 @@ partial class Player : AnimatedEntity
 		EnableHideInFirstPerson = true;
 		EnableShadowInFirstPerson = true;
 		EnableTouch = true;
+		EnableLagCompensation = true;
 
 		MoveToSpawnpoint();
 		Event.Run( "Player.PostSpawn", this );
