@@ -1064,10 +1064,11 @@ public partial class WalkController : MovementComponent
 						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
 						var x4 = ((oldpos - pos) * -1);
 						var tr3 = Trace.Ray( Entity.Position, pos + x3 ).Ignore( tr.Entity ).Ignore( Entity ).Run();
+
 						if ( tr3.Fraction != 1 )
 						{
-							Entity.TakeDamage( DamageInfo.Generic( 1000 ).WithTag( "crush" ) );
-							return;
+							Entity.TakeDamage( DamageInfo.Generic( 10 ).WithTag( "crush" ) );
+							continue;
 						}
 						if ( !(x3 / Time.Delta).AlmostEqual( Vector3.Zero, 0.01f ) )
 						{
