@@ -1032,7 +1032,7 @@ public partial class WalkController : MovementComponent
 		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
 		PreviousViewAngles = ply.ViewAngles;
 	}
-	bool PushDebug = true;
+	bool PushDebug = false;
 	[SkipHotload] Dictionary<int, Transform> OldTransforms;
 	Transform OldTransform;
 	void DoPushingStuff()
