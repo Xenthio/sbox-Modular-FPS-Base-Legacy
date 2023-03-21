@@ -969,8 +969,8 @@ public partial class WalkController : MovementComponent
 		Entity.Position = trace.EndPosition;
 	}
 
-	public Transform? GroundTransform { get; set; }
-	public Sandbox.Entity? OldGroundEntity { get; set; }
+	public Transform? GroundTransform;
+	public Sandbox.Entity? OldGroundEntity;
 	void RestoreGroundPos()
 	{
 		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransform == null || Entity.GroundEntity != OldGroundEntity )
@@ -1006,8 +1006,8 @@ public partial class WalkController : MovementComponent
 		OldGroundEntity = Entity.GroundEntity;
 	}
 
-	public Transform? GroundTransformViewAngles { get; set; }
-	public Angles? PreviousViewAngles { get; set; }
+	public Transform? GroundTransformViewAngles;
+	public Angles? PreviousViewAngles;
 	void RestoreGroundAngles()
 	{
 		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransformViewAngles == null || PreviousViewAngles == null )
