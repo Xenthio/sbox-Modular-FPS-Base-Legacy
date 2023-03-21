@@ -1031,6 +1031,7 @@ public partial class WalkController : MovementComponent
 		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
 		PreviousViewAngles = ply.ViewAngles;
 	}
+	bool PushDebug = false;
 	[SkipHotload] Dictionary<int, Transform> OldTransforms;
 	Transform OldTransform;
 	void DoPushingStuff()
@@ -1059,7 +1060,7 @@ public partial class WalkController : MovementComponent
 
 					if ( !tr2.StartedSolid )
 					{
-						DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
+						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
 						var x4 = ((oldpos - pos) * -1);
 						Entity.Velocity += (x3 / Time.Delta);
 						//Entity.Velocity = (x4 / Time.Delta);
@@ -1069,17 +1070,17 @@ public partial class WalkController : MovementComponent
 					}
 					else
 					{
-						DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
+						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
 					}
 				}
 				if ( unstuck )
 				{
-					DebugOverlay.Text( "unstuck", Entity.Position, Color.Green );
+					if ( PushDebug ) DebugOverlay.Text( "unstuck", Entity.Position, Color.Green );
 				}
 				else
 				{
 
-					DebugOverlay.Text( "failed", Entity.Position, Color.Red );
+					if ( PushDebug ) DebugOverlay.Text( "failed", Entity.Position, Color.Red );
 				}
 			}
 		}
