@@ -49,7 +49,12 @@ public class UnstuckComponent : EntityComponent<Player>
 			lastPos = Entity.Position;
 			return false;
 		}
-
+		if ( StuckTries <= 2 )
+		{
+			StuckTries++;
+			lastPos = Entity.Position;
+			return true;
+		}
 		int AttemptsPerTick = 256;
 
 		for ( int i = 0; i < AttemptsPerTick; i++ )

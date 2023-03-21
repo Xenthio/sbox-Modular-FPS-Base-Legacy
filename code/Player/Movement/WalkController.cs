@@ -983,7 +983,7 @@ public partial class WalkController : MovementComponent
 		{
 			Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
 		}
-		Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z ));
+		//Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z ));
 	}
 
 	void SaveGroundPos()
@@ -1032,7 +1032,7 @@ public partial class WalkController : MovementComponent
 		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
 		PreviousViewAngles = ply.ViewAngles;
 	}
-	bool PushDebug = false;
+	bool PushDebug = true;
 	[SkipHotload] Dictionary<int, Transform> OldTransforms;
 	Transform OldTransform;
 	void DoPushingStuff()
@@ -1046,10 +1046,11 @@ public partial class WalkController : MovementComponent
 				var x = tf.ToLocal( Entity.Transform );
 				var x2 = tr.Entity.Transform.ToWorld( x );
 				var x3 = ((Entity.Position - x2.Position) * -1);//.WithZ( 0 );
+				var x4 = ((Entity.Position - x2.Position) * -1).WithZ( 0 );
 				var oldpos = Entity.Position;
 				var oldvel = Entity.Velocity;
 				bool unstuck = false;
-				for ( int i = 0; i < 1024; i++ )
+				for ( int i = 0; i < 2048; i++ )
 				{
 					var ch = (x3 * (i / 16.0f));
 					var pos = Entity.Position + ch;
@@ -1061,21 +1062,59 @@ public partial class WalkController : MovementComponent
 
 					if ( !tr2.StartedSolid )
 					{
-						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
-						var x4 = ((oldpos - pos) * -1);
+						var x5 = ((oldpos - pos) * -1);
 						var tr3 = Trace.Ray( Entity.Position, pos + x3 ).Ignore( tr.Entity ).Ignore( Entity ).Run();
+
 
 						if ( tr3.Fraction != 1 )
 						{
-							Entity.TakeDamage( DamageInfo.Generic( 10 ).WithTag( "crush" ) );
-							continue;
+							var ch2 = (x4 * (i / 16.0f));
+							var pos2 = Entity.Position + ch2;
+							var tr4 = TraceBBox( pos2, pos2 );
+							var tr5 = Trace.Ray( Entity.Position, pos2 + x4 ).Ignore( tr.Entity ).Ignore( Entity ).Run();
+							if ( !tr4.StartedSolid && tr5.Fraction == 1 )
+							{
+								x3 = x4;
+								ch = ch2;
+								pos = pos2;
+							}
+							else
+							{
+								//crush / stuck 
+								if ( tr.Entity is DoorEntity door )
+								{
+									if ( Game.IsServer )
+									{
+										if ( door.State == DoorEntity.DoorState.Opening )
+											door.Close();
+										if ( door.State == DoorEntity.DoorState.Closing )
+											door.Open();
+
+										Entity.TakeDamage( DamageInfo.Generic( 10 ).WithTag( "crush" ) );
+									}
+									GetPossibleTransforms();
+									OldTransforms.Remove( tr.Entity.NetworkIdent );
+									if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
+									return;
+								}
+								else
+								{
+									if ( Game.IsServer )
+									{
+										Entity.TakeDamage( DamageInfo.Generic( 10 ).WithTag( "crush" ) );
+									}
+									if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
+									continue;
+								}
+							}
 						}
+						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
 						if ( !(x3 / Time.Delta).AlmostEqual( Vector3.Zero, 0.01f ) )
 						{
 							Entity.Velocity += (x3 / Time.Delta);
 							Entity.Position = pos + x3;
 						}
-						//Entity.Velocity = (x4 / Time.Delta);
+						//Entity.Velocity = (x5 / Time.Delta);
 						unstuck = true;
 						break;
 					}
@@ -1095,6 +1134,12 @@ public partial class WalkController : MovementComponent
 				}
 			}
 		}
+		GetPossibleTransforms();
+	}
+
+	void GetPossibleTransforms()
+	{
+
 		var a = Sandbox.Entity.FindInSphere( Entity.Position, 512 + Entity.Velocity.Length );
 		var b = new Dictionary<int, Transform>();
 		foreach ( var i in a )
