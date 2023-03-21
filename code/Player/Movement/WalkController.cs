@@ -264,6 +264,7 @@ public partial class WalkController : MovementComponent
 			Entity.Velocity = Entity.Velocity.WithZ( 0 );
 		}
 		DoPushingStuff();
+		if ( Entity == null ) return;
 
 		// CheckFalling(); // fall damage etc
 
