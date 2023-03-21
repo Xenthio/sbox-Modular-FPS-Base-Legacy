@@ -1044,13 +1044,13 @@ public partial class WalkController : MovementComponent
 			{
 				var x = tf.ToLocal( Entity.Transform );
 				var x2 = tr.Entity.Transform.ToWorld( x );
-				var x3 = ((Entity.Position - x2.Position) * -1).WithZ( 0 );
+				var x3 = ((Entity.Position - x2.Position) * -1);//.WithZ( 0 );
 				var oldpos = Entity.Position;
 				var oldvel = Entity.Velocity;
 				bool unstuck = false;
 				for ( int i = 0; i < 1024; i++ )
 				{
-					var ch = (x3 * (i / 32.0f));
+					var ch = (x3 * (i / 16.0f));
 					var pos = Entity.Position + ch;
 
 
@@ -1062,9 +1062,18 @@ public partial class WalkController : MovementComponent
 					{
 						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
 						var x4 = ((oldpos - pos) * -1);
-						Entity.Velocity += (x3 / Time.Delta);
+						var tr3 = Trace.Ray( Entity.Position, pos + x3 ).Ignore( tr.Entity ).Ignore( Entity ).Run();
+						if ( tr3.Fraction != 1 )
+						{
+							Entity.TakeDamage( DamageInfo.Generic( 1000 ).WithTag( "crush" ) );
+							return;
+						}
+						if ( !(x3 / Time.Delta).AlmostEqual( Vector3.Zero, 0.01f ) )
+						{
+							Entity.Velocity += (x3 / Time.Delta);
+							Entity.Position = pos + x3;
+						}
 						//Entity.Velocity = (x4 / Time.Delta);
-						Entity.Position = pos + x3;
 						unstuck = true;
 						break;
 					}
