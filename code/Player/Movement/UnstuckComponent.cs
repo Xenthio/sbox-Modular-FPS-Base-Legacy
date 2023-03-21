@@ -8,6 +8,7 @@ public class UnstuckComponent : EntityComponent<Player>
 	public bool IsActive; // replicate
 
 	internal int StuckTries = 0;
+	internal Vector3 lastPos;
 	public void Simulate( IClient cl )
 	{
 		if ( Game.IsServer ) TestAndFix();
@@ -16,12 +17,14 @@ public class UnstuckComponent : EntityComponent<Player>
 	//[Event.Tick.Server]
 	public virtual bool TestAndFix()
 	{
+		//return false;
 		var result = TraceBBox( Entity.Position, Entity.Position );
 
 		// Not stuck, we cool
 		if ( !result.StartedSolid )
 		{
 			StuckTries = 0;
+			lastPos = Entity.Position;
 			return false;
 		}
 		if ( Entity is Player player )
@@ -40,7 +43,12 @@ public class UnstuckComponent : EntityComponent<Player>
 				DebugOverlay.Box( result.Entity, Color.Red );
 			}
 		}
-
+		if ( lastPos != Entity.Position )
+		{
+			StuckTries = 0;
+			lastPos = Entity.Position;
+			return false;
+		}
 
 		int AttemptsPerTick = 256;
 
@@ -48,6 +56,7 @@ public class UnstuckComponent : EntityComponent<Player>
 		{
 			var pos = Entity.Position + Vector3.Random.Normal * (((float)StuckTries) / 2.0f);
 			// First try the up direction for moving platforms
+
 			if ( i == 0 )
 			{
 				pos = Entity.Position + Vector3.Up * 5;
@@ -76,6 +85,7 @@ public class UnstuckComponent : EntityComponent<Player>
 		}
 
 		StuckTries++;
+		lastPos = Entity.Position;
 		return true;
 	}
 	public void FrameSimulate( IClient cl )

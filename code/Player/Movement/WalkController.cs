@@ -1,6 +1,7 @@
 ﻿
 using Sandbox;
 using System;
+using System.Collections.Generic;
 
 namespace MyGame;
 [Library]
@@ -127,7 +128,6 @@ public partial class WalkController : MovementComponent
 
 
 		RestoreGroundPos();
-
 		//Entity.Velocity += Entity.BaseVelocity * (1 + Time.Delta * 0.5f);
 		//Entity.BaseVelocity = Vector3.Zero;
 
@@ -263,6 +263,7 @@ public partial class WalkController : MovementComponent
 		{
 			Entity.Velocity = Entity.Velocity.WithZ( 0 );
 		}
+		DoPushingStuff();
 
 		// CheckFalling(); // fall damage etc
 
@@ -981,7 +982,7 @@ public partial class WalkController : MovementComponent
 		{
 			Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
 		}
-		//Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z )) + (Vector3.Up * 0.13125f);
+		Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z ));
 	}
 
 	void SaveGroundPos()
@@ -1030,5 +1031,65 @@ public partial class WalkController : MovementComponent
 		GroundTransformViewAngles = Entity.GroundEntity.Transform.ToLocal( new Transform( Vector3.Zero, ply.ViewAngles.ToRotation() ) );
 		PreviousViewAngles = ply.ViewAngles;
 	}
+	[SkipHotload] Dictionary<int, Transform> OldTransforms;
+	Transform OldTransform;
+	void DoPushingStuff()
+	{
+		var tr = TraceBBox( Entity.Position, Entity.Position );
+		if ( tr.StartedSolid && tr.Entity != null && !tr.Entity.IsWorld && tr.Entity != OldGroundEntity && tr.Entity != Entity.GroundEntity )
+		{
+			var tf = new Transform();
+			if ( OldTransforms != null && OldTransforms.TryGetValue( tr.Entity.NetworkIdent, out tf ) )
+			{
+				var x = tf.ToLocal( Entity.Transform );
+				var x2 = tr.Entity.Transform.ToWorld( x );
+				var x3 = ((Entity.Position - x2.Position) * -1).WithZ( 0 );
+				var oldpos = Entity.Position;
+				var oldvel = Entity.Velocity;
+				bool unstuck = false;
+				for ( int i = 0; i < 1024; i++ )
+				{
+					var ch = (x3 * (i / 32.0f));
+					var pos = Entity.Position + ch;
 
+
+					tr.Entity.ResetInterpolation();
+					Entity.ResetInterpolation();
+					var tr2 = TraceBBox( pos, pos );
+
+					if ( !tr2.StartedSolid )
+					{
+						DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
+						var x4 = ((oldpos - pos) * -1);
+						Entity.Velocity += (x3 / Time.Delta);
+						//Entity.Velocity = (x4 / Time.Delta);
+						Entity.Position = pos + x3;
+						unstuck = true;
+						break;
+					}
+					else
+					{
+						DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
+					}
+				}
+				if ( unstuck )
+				{
+					DebugOverlay.Text( "unstuck", Entity.Position, Color.Green );
+				}
+				else
+				{
+
+					DebugOverlay.Text( "failed", Entity.Position, Color.Red );
+				}
+			}
+		}
+		var a = Sandbox.Entity.FindInSphere( Entity.Position, 512 + Entity.Velocity.Length );
+		var b = new Dictionary<int, Transform>();
+		foreach ( var i in a )
+		{
+			b.Add( i.NetworkIdent, i.Transform );
+		}
+		OldTransforms = b;
+		OldTransform = Entity.Transform;
+	}
 }
