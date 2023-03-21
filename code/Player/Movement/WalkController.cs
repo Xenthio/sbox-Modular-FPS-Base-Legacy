@@ -977,7 +977,10 @@ public partial class WalkController : MovementComponent
 			return;
 
 		var worldTrns = Entity.GroundEntity.Transform.ToWorld( GroundTransform.Value );
-		Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
+		if ( Prediction.FirstTime )
+		{
+			Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
+		}
 		Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z ));
 	}
 
@@ -991,19 +994,16 @@ public partial class WalkController : MovementComponent
 			return;
 		}
 
-		if ( Prediction.FirstTime )
+		if ( Entity.GroundEntity == OldGroundEntity )
 		{
-			if ( Entity.GroundEntity == OldGroundEntity )
-			{
-				GroundTransform = Entity.GroundEntity.Transform.ToLocal( Entity.Transform );
-			}
-			else
-			{
-				GroundTransform = null;
-				GroundTransformViewAngles = null;
-			}
-			OldGroundEntity = Entity.GroundEntity;
+			GroundTransform = Entity.GroundEntity.Transform.ToLocal( Entity.Transform );
 		}
+		else
+		{
+			GroundTransform = null;
+			GroundTransformViewAngles = null;
+		}
+		OldGroundEntity = Entity.GroundEntity;
 	}
 
 	public Transform? GroundTransformViewAngles { get; set; }
