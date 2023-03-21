@@ -981,7 +981,7 @@ public partial class WalkController : MovementComponent
 		{
 			Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
 		}
-		Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z ));
+		//Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z )) + (Vector3.Up * 0.13125f);
 	}
 
 	void SaveGroundPos()

@@ -10,12 +10,9 @@ public class UnstuckComponent : EntityComponent<Player>
 	internal int StuckTries = 0;
 	public void Simulate( IClient cl )
 	{
-		TestAndFix();
+		if ( Game.IsServer ) TestAndFix();
 	}
 
-	Entity PreviousEntity { get; set; }
-	Transform? PreviousEntityTransform { get; set; }
-	Transform? PreviousEntityTransformLocal { get; set; }
 	//[Event.Tick.Server]
 	public virtual bool TestAndFix()
 	{
@@ -25,9 +22,6 @@ public class UnstuckComponent : EntityComponent<Player>
 		if ( !result.StartedSolid )
 		{
 			StuckTries = 0;
-			PreviousEntity = null;
-			PreviousEntityTransform = null;
-			PreviousEntityTransformLocal = null;
 			return false;
 		}
 		if ( Entity is Player player )
@@ -48,32 +42,17 @@ public class UnstuckComponent : EntityComponent<Player>
 		}
 
 
-		int AttemptsPerTick = 1024;
+		int AttemptsPerTick = 256;
 
 		for ( int i = 0; i < AttemptsPerTick; i++ )
 		{
-			var pos = Entity.Position + Vector3.Random.Normal * (((float)StuckTries) / 1.0f);
-			var vel = Vector3.Zero;
-			// First try the velocity direction for moving platforms
+			var pos = Entity.Position + Vector3.Random.Normal * (((float)StuckTries) / 2.0f);
+			// First try the up direction for moving platforms
 			if ( i == 0 )
 			{
-				pos = Entity.Position + (result.Entity.Velocity * Time.Delta);
-				vel = result.Entity.Velocity;
+				pos = Entity.Position + Vector3.Up * 5;
 			}
-			else
-			// do more funky stuff for moving platforms
-			if ( result.Entity.Transform != PreviousEntityTransform && result.Entity == PreviousEntity )
-			{
-				if ( i >= 1 && i <= 512 )
-				{
-					var worldTrns = result.Entity.Transform.ToWorld( PreviousEntityTransformLocal.Value );
-					pos = worldTrns.Position;
-					var modifier = (((Entity.Position - worldTrns.Position) * -2) * Time.Delta)
-								+ ((((Entity.Position - worldTrns.Position) * -1) * Time.Delta) * ((float)i / 5.0f));
-					pos += modifier;
-					vel = modifier / Time.Delta;
-				}
-			}
+
 
 			result = TraceBBox( pos, pos );
 
@@ -86,11 +65,6 @@ public class UnstuckComponent : EntityComponent<Player>
 				}
 
 				Entity.Position = pos;
-				Entity.Velocity += vel;
-				PreviousEntity = null;
-				PreviousEntityTransform = null;
-				PreviousEntityTransformLocal = null;
-				return false;
 			}
 			else
 			{
@@ -102,9 +76,6 @@ public class UnstuckComponent : EntityComponent<Player>
 		}
 
 		StuckTries++;
-		PreviousEntity = result.Entity;
-		PreviousEntityTransform = result.Entity.Transform;
-		PreviousEntityTransformLocal = result.Entity.Transform.ToLocal( Entity.Transform );
 		return true;
 	}
 	public void FrameSimulate( IClient cl )
