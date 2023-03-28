@@ -54,7 +54,7 @@ public partial class Gun : Weapon
 			Game.SetRandomSeed( Time.Tick + i );
 			var forward = Owner.AimRay.Forward;
 			forward += Vector3.Random * spread;
-			var tr = Trace.Ray( Owner.AimRay.Position, Owner.AimRay.Position + (forward * 65565) ).UseHitboxes().Ignore( Owner ).Run();
+			var tr = Trace.Ray( Owner.AimRay.Position, Owner.AimRay.Position + (forward * 65565) ).UseHitboxes().Ignore( Owner ).WithoutTags( "trigger" ).Run();
 			if ( tr.Hit )
 			{
 				tr.Surface.DoBulletImpact( tr );

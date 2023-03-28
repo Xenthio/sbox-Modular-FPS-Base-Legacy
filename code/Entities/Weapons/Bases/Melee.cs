@@ -15,7 +15,7 @@ public partial class Melee : Weapon
 		Game.SetRandomSeed( Time.Tick );
 		var forward = Owner.AimRay.Forward;
 		forward += Vector3.Random * spread;
-		var tr = Trace.Ray( Owner.AimRay.Position, Owner.AimRay.Position + (forward * distance) ).UseHitboxes().Ignore( Owner ).Run();
+		var tr = Trace.Ray( Owner.AimRay.Position, Owner.AimRay.Position + (forward * distance) ).UseHitboxes().Ignore( Owner ).WithoutTags( "trigger" ).Run();
 		if ( tr.Hit )
 		{
 			tr.Surface.DoBulletImpact( tr );
