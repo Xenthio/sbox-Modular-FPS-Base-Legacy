@@ -39,6 +39,9 @@ public class ThirdPersonCamera : CameraComponent
 	}
 	public override void BuildInput()
 	{
+		if ( Game.LocalClient.Components.TryGet<DevCamera>( out var _ ) )
+			return;
+
 		var pl = Entity as Player;
 		var viewAngles = (pl.ViewAngles + Input.AnalogLook).Normal;
 		pl.ViewAngles = viewAngles.WithPitch( viewAngles.pitch.Clamp( -89f, 89f ) );
