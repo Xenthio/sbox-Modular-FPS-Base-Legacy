@@ -79,6 +79,7 @@ public class UnstuckComponent : EntityComponent<Player>
 				}
 
 				Entity.Position = pos;
+				break;
 			}
 			else
 			{
