@@ -3,12 +3,12 @@ using System.Collections.Generic;
 namespace MyGame;
 public partial class InventoryComponent : SimulatedComponent, ISingletonComponent
 {
-	[Net] public Entity ActiveChild { get; set; }
+	[Net, Predicted] public Entity ActiveChild { get; set; }
 	[ClientInput] public Entity ActiveChildInput { get; set; }
 	[Net] public List<Entity> Items { get; set; } = new();
 	public static int MaxItems { get; set; } = 32;
 
-	Entity PreviousActiveChild { get; set; }
+	[Predicted] Entity PreviousActiveChild { get; set; }
 
 	public bool AddItem( Entity item )
 	{
@@ -16,7 +16,6 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 		{
 			Items.Add( item );
 			if ( item is Carriable cr1 ) cr1.OnPickup( Entity );
-			ActiveChild = item;
 			ActiveChildInput = item;
 			return true;
 		}
@@ -121,16 +120,14 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 			item.EnableDrawing = true;
 		}
 
-		if ( ActiveChildInput.IsValid() )
+		if ( ActiveChildInput.IsValid() && ActiveChildInput.Owner == Entity )
 		{
-			if ( ActiveChildInput.Owner == Entity )
-			{
-				ActiveChild = ActiveChildInput;
-			}
+			ActiveChild = ActiveChildInput;
 		}
 		else
 		{
-			ActiveChild = ActiveChildInput;
+			ActiveChildInput = null;
+			if ( Game.IsServer ) ActiveChild = null;
 		}
 
 		// Check to see if we've changed weapons
