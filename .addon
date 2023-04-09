@@ -1,8 +1,8 @@
 {
-  "Title": "EasyGameBaseConcept",
+  "Title": "Easy FPS Base",
   "Type": "game",
-  "Org": "local",
-  "Ident": "easy_fps_concept",
+  "Org": "xenthio",
+  "Ident": "easy_fps_base",
   "Tags": null,
   "Schema": 1,
   "HasAssets": true,
@@ -63,6 +63,9 @@
           "b": "player"
         }
       ]
-    }
+    },
+    "Summary": "",
+    "Description": "",
+    "Public": true
   }
 }
