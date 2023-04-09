@@ -1045,8 +1045,12 @@ public partial class WalkController : MovementComponent
 			{
 				var x = tf.ToLocal( Entity.Transform );
 				var x2 = tr.Entity.Transform.ToWorld( x );
+
+				// grab the delta between the last ticks position and this ticks position
 				var x3 = ((Entity.Position - x2.Position) * -1);//.WithZ( 0 );
 				var x4 = ((Entity.Position - x2.Position) * -1).WithZ( 0 );
+
+				// grab the delta between the last ticks position and this ticks position
 				var oldpos = Entity.Position;
 				var oldvel = Entity.Velocity;
 				bool unstuck = false;
