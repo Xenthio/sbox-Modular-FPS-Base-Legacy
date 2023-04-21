@@ -180,7 +180,7 @@ public partial class WalkController : MovementComponent
 			WaterSimulate();
 		}
 		else
-		if ( AutoJump ? Input.Down( InputButton.Jump ) : Input.Pressed( InputButton.Jump ) )
+		if ( AutoJump ? Input.Down( "Jump" ) : Input.Pressed( "Jump" ) )
 		{
 			CheckJumpButton();
 		}
@@ -298,9 +298,9 @@ public partial class WalkController : MovementComponent
 		var ws = -1;// Duck.GetWishSpeed();
 		if ( ws >= 0 ) return ws;
 
-		if ( Input.Down( InputButton.Duck ) || IsDucking ) return CrouchSpeed;
-		if ( Input.Down( InputButton.Run ) ) return SprintSpeed;
-		if ( Input.Down( InputButton.Walk ) ) return WalkSpeed;
+		if ( Input.Down( "Duck" ) || IsDucking ) return CrouchSpeed;
+		if ( Input.Down( "Run" ) ) return SprintSpeed;
+		if ( Input.Down( "Walk" ) ) return WalkSpeed;
 
 		return DefaultSpeed;
 	}
@@ -460,7 +460,7 @@ public partial class WalkController : MovementComponent
 	public virtual void CheckDuck()
 	{
 		var pl = Entity as Player;
-		bool wants = Input.Down( InputButton.Duck );
+		bool wants = Input.Down( "Duck" );
 
 		if ( wants != IsDucking )
 		{
@@ -655,7 +655,7 @@ public partial class WalkController : MovementComponent
 		}
 
 		// Was jump button pressed?
-		if ( Input.Down( InputButton.Jump ) )
+		if ( Input.Down( "Jump" ) )
 		{
 			CheckJumpButton();
 		}
@@ -763,7 +763,7 @@ public partial class WalkController : MovementComponent
 
 		if ( IsTouchingLadder )
 		{
-			if ( Input.Pressed( InputButton.Jump ) )
+			if ( Input.Pressed( "Jump" ) )
 			{
 				Entity.Velocity = LadderNormal * 100.0f;
 				IsTouchingLadder = false;

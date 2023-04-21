@@ -30,7 +30,7 @@ public partial class Weapon : Carriable
 	public override void Simulate( IClient cl )
 	{
 		if ( Owner is not Player ) return;
-		if ( CanReloadPrimary() && Input.Pressed( InputButton.Reload ) )
+		if ( CanReloadPrimary() && Input.Pressed( "Reload" ) )
 		{
 			TimeSincePrimaryReload = 0;
 			ReloadPrimary();
@@ -109,10 +109,10 @@ public partial class Weapon : Carriable
 	}
 	public virtual bool CanPrimaryAttack()
 	{
-		return (Automatic ? Input.Down( InputButton.PrimaryAttack ) : Input.Pressed( InputButton.PrimaryAttack )) && TimeSincePrimaryAttack >= PrimaryAttackDelay;
+		return (Automatic ? Input.Down( "Attack1" ) : Input.Pressed( "Attack1" )) && TimeSincePrimaryAttack >= PrimaryAttackDelay;
 	}
 	public virtual bool CanSecondaryAttack()
 	{
-		return (Automatic ? Input.Down( InputButton.SecondaryAttack ) : Input.Pressed( InputButton.SecondaryAttack )) && TimeSinceSecondaryAttack >= SecondaryAttackDelay;
+		return (Automatic ? Input.Down( "Attack2" ) : Input.Pressed( "Attack2" )) && TimeSinceSecondaryAttack >= SecondaryAttackDelay;
 	}
 }

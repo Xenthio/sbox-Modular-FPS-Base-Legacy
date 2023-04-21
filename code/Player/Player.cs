@@ -212,7 +212,7 @@ partial class Player : AnimatedEntity
 	{
 		base.Simulate( cl );
 		// toggleable third person
-		if ( Input.Pressed( InputButton.View ) && Game.IsServer )
+		if ( Input.Pressed( "View" ) && Game.IsServer )
 		{
 			if ( CameraController is FirstPersonCamera )
 			{
@@ -267,7 +267,7 @@ partial class Player : AnimatedEntity
 		if ( LifeState != LifeState.Alive )
 			return;
 
-		if ( !Game.IsServer )
+		if ( Game.IsServer )
 			return;
 
 		if ( timeSinceLastFootstep < 0.2f )

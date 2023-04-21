@@ -111,7 +111,7 @@ public partial class InventoryComponent : SimulatedComponent, ISingletonComponen
 
 		// drop weapons
 
-		if ( Input.Pressed( InputButton.Drop ) && ActiveChild != null )
+		if ( Input.Pressed( "Drop" ) && ActiveChild != null )
 		{
 			var item = ActiveChild;
 			DropItem( item );

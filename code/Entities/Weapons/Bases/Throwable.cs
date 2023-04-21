@@ -30,11 +30,11 @@ public partial class Throwable : Carriable
 	}
 	public virtual bool PullPin()
 	{
-		return Input.Pressed( InputButton.PrimaryAttack );
+		return Input.Pressed( "Attack1" );
 	}
 	public virtual bool WillThrow()
 	{
-		return Input.Released( InputButton.PrimaryAttack );
+		return Input.Released( "Attack1" );
 	}
 	public virtual void Throw()
 	{

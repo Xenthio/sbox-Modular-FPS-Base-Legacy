@@ -30,17 +30,17 @@ public partial class NoclipController : MovementComponent
 
 		var vel = (rotation.Forward * fwd) + (rotation.Left * left);
 
-		if ( Input.Down( InputButton.Jump ) )
+		if ( Input.Down( "Jump" ) )
 		{
 			vel += Vector3.Up * 1;
 		}
 
 		vel = vel.Normal * 2000;
 
-		if ( Input.Down( InputButton.Run ) )
+		if ( Input.Down( "Run" ) )
 			vel *= 5.0f;
 
-		if ( Input.Down( InputButton.Duck ) )
+		if ( Input.Down( "Duck" ) )
 			vel *= 0.2f;
 
 		pl.Velocity += vel * Time.Delta;

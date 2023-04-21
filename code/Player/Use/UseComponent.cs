@@ -20,7 +20,7 @@ public partial class UseComponent : SimulatedComponent
 		// Turn prediction off
 		using ( Prediction.Off() )
 		{
-			if ( Input.Pressed( InputButton.Use ) )
+			if ( Input.Pressed( "Use" ) )
 			{
 				Using = FindUsable();
 
@@ -31,7 +31,7 @@ public partial class UseComponent : SimulatedComponent
 				}
 			}
 
-			if ( !Input.Down( InputButton.Use ) )
+			if ( !Input.Down( "Use" ) )
 			{
 				StopUsing();
 				return;
