@@ -208,7 +208,7 @@ public partial class WalkController : MovementComponent
 		WishVelocity = new Vector3( pl.InputDirection.x.Clamp( -1f, 1f ), pl.InputDirection.y.Clamp( -1f, 1f ), 0 );
 		var inSpeed = WishVelocity.Length.Clamp( 0, 1 );
 
-		if ( Swimming )
+		if ( Swimming || IsTouchingLadder )
 		{
 
 			WishVelocity *= pl.ViewAngles.ToRotation();
@@ -272,6 +272,8 @@ public partial class WalkController : MovementComponent
 		// Swim Sounds
 
 		SaveGroundPos();
+		LatchOntoLadder();
+		PreviousGroundEntity = Entity.GroundEntity;
 
 		bool Debug = false;
 		if ( Debug )
@@ -753,19 +755,35 @@ public partial class WalkController : MovementComponent
 	bool IsTouchingLadder = false;
 	Vector3 LadderNormal;
 
+	Vector3 LastNonZeroWishLadderVelocity;
 	public virtual void CheckLadder()
 	{
 		var pl = Entity as Player;
 
 		var wishvel = new Vector3( pl.InputDirection.x.Clamp( -1f, 1f ), pl.InputDirection.y.Clamp( -1f, 1f ), 0 );
+		if ( wishvel.Length > 0 )
+		{
+			LastNonZeroWishLadderVelocity = wishvel;
+		}
+		if ( TryLatchNextTickCounter > 0 ) wishvel = LastNonZeroWishLadderVelocity * -1;
 		wishvel *= pl.ViewAngles.WithPitch( 0 ).ToRotation();
 		wishvel = wishvel.Normal;
+
 
 		if ( IsTouchingLadder )
 		{
 			if ( Input.Pressed( "Jump" ) )
 			{
-				Entity.Velocity = LadderNormal * 100.0f;
+				var sidem = (Math.Abs( Entity.ViewAngles.ToRotation().Forward.Abs().z - 1 ) * 3).Clamp( 0, 1 );
+				var upm = Entity.ViewAngles.ToRotation().Forward.z;
+
+				var Eject = new Vector3();
+
+				Eject.x = LadderNormal.x * sidem;
+				Eject.y = LadderNormal.y * sidem;
+				Eject.z = (3 * upm).Clamp( 0, 1 );
+
+				Entity.Velocity += Eject * 180.0f;
 				IsTouchingLadder = false;
 
 				return;
@@ -797,15 +815,58 @@ public partial class WalkController : MovementComponent
 			LadderNormal = pm.Normal;
 		}
 	}
-
 	public virtual void LadderMove()
 	{
 		var velocity = WishVelocity;
 		float normalDot = velocity.Dot( LadderNormal );
+
 		var cross = LadderNormal * normalDot;
 		Entity.Velocity = (velocity - cross) + (-normalDot * LadderNormal.Cross( Vector3.Up.Cross( LadderNormal ).Normal ));
 
 		Move();
+	}
+
+	Entity PreviousGroundEntity;
+	int TryLatchNextTickCounter = 0;
+	Vector3 LastNonZeroWishVelocity;
+	[ConVar.Replicated( "sv_ladderlatchdebug" )]
+	public static bool LatchDebug { get; set; } = false;
+	public virtual void LatchOntoLadder()
+	{
+		if ( !WishVelocity.Normal.IsNearlyZero( 0.001f ) )
+		{
+			LastNonZeroWishVelocity = WishVelocity;
+		}
+		if ( TryLatchNextTickCounter > 0 )
+		{
+
+			Entity.Velocity = (LastNonZeroWishVelocity.Normal * -100).WithZ( Entity.Velocity.z );
+			TryLatchNextTickCounter++;
+		}
+		if ( TryLatchNextTickCounter >= 10 )
+		{
+			TryLatchNextTickCounter = 0;
+		}
+
+		if ( Entity.GroundEntity != null ) return;
+		if ( PreviousGroundEntity == null ) return;
+		var pos = Entity.Position + (Vector3.Down * 16);
+		//var tr = TraceBBox( pos, pos );
+
+		var tr = Trace.Ray( pos, pos - (LastNonZeroWishVelocity.Normal * 8) )
+					.Size( mins, maxs )
+					.WithTag( "ladder" )
+					.Ignore( Entity )
+					.Run();
+
+		if ( LatchDebug ) DebugOverlay.Line( Entity.Position, pos, 10 );
+		if ( LatchDebug ) DebugOverlay.Line( tr.StartPosition, tr.EndPosition, 10 );
+		if ( tr.Hit )
+		{
+			Entity.Velocity = Vector3.Zero.WithZ( Entity.Velocity.z );
+			TryLatchNextTickCounter++;
+		}
+
 	}
 
 
