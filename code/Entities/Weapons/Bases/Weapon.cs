@@ -90,7 +90,7 @@ public partial class Weapon : Carriable
 	}
 	public virtual bool CanReloadPrimary()
 	{
-		return PrimaryAmmo != MaxPrimaryAmmo && (Owner as Player).Ammo.AmmoCount( PrimaryAmmoType ) > 0;
+		return PrimaryAmmo != MaxPrimaryAmmo && (Owner as Player).Ammo.AmmoCount( PrimaryAmmoType ) > 0 && !IsPrimaryReloading;
 	}
 	public virtual bool CanReloadSecondary()
 	{
