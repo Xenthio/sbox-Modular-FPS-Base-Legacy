@@ -38,6 +38,21 @@ public partial class MyGame
 
 		//Log.Info( $"ent: {ent}" );
 	}
+
+	[ConCmd.Server( "give" )]
+	public static void GiveWeapon( string entName )
+	{
+		if ( ConsoleSystem.Caller.Pawn is Player player )
+		{
+			if ( player.Inventory.AddItem( TypeLibrary.Create<Entity>( entName ) ) )
+			{
+				Log.Info( $"Giving {entName} to {player.Client.Name}" );
+				return;
+			}
+			Log.Info( $"Failed to give {entName}. Not a valid entity." );
+		}
+	}
+
 	[ConCmd.Server( "reset_game" )]
 	public static void ResetGame()
 	{
