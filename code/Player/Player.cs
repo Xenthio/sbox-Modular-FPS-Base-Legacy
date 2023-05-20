@@ -148,6 +148,7 @@ partial class Player : AnimatedEntity
 	DamageInfo LastDamage;
 	public override void TakeDamage( DamageInfo info )
 	{
+		if ( Game.IsClient ) return;
 		Event.Run( "Player.PreTakeDamage", info, this );
 		LastDamage = info;
 		LastAttacker = info.Attacker;
@@ -165,6 +166,7 @@ partial class Player : AnimatedEntity
 	}
 	public override void OnKilled()
 	{
+		if ( Game.IsClient ) return;
 		Event.Run( "Player.PreOnKilled", this );
 		LifeState = LifeState.Dead;
 		BecomeRagdoll( LastDamage );
