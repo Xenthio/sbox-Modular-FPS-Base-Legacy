@@ -1101,6 +1101,56 @@ public partial class WalkController : MovementComponent
 		var tr = TraceBBox( Entity.Position, Entity.Position );
 		if ( tr.StartedSolid && tr.Entity != null && !tr.Entity.IsWorld && tr.Entity != OldGroundEntity && tr.Entity != Entity.GroundEntity )
 		{
+			if ( OldTransforms != null && OldTransforms.TryGetValue( tr.Entity.NetworkIdent, out var oldTransform ) )
+			{
+				var oldTransformLocal = oldTransform.ToLocal( Entity.Transform );
+				var newTransform = tr.Entity.Transform.ToWorld( oldTransformLocal );
+
+				// this used to be just the direction of the tr delta however pushing outwards a llittle seems more appropriate
+				var direction = ((Entity.Position - newTransform.Position) * -1).WithZ( 0 );
+				direction += (Entity.Position - tr.Entity.Position).Normal.WithZ( 0 ) * 0.8f;
+
+				// offset = how much are we inside of the platform? what is needed to work this out? surely theres a better and smarter way?
+				var offset = 0.0f;
+
+
+				// ------------------------ shit ------------------------
+				//			look into doing this nicer at somepoint
+				// ------------------------------------------------------
+				// brute force our way into finding how much extra we need to be pushed in the case of AABB edges being still inside of the object
+				for ( int i = 0; i < 512; i++ )
+				{
+					var possibleoffset = (float)(i) / 16f;
+					var pos = newTransform.Position + (direction * possibleoffset);
+
+					var offsettr = TraceBBox( pos, pos );
+					if ( !offsettr.StartedSolid )
+					{
+						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
+						offset = possibleoffset;
+						break;
+					}
+					if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
+				}
+				// ------------------------------------------------------
+
+				Entity.Velocity += (direction / Time.Delta);
+
+				// insurance we dont instantly get stuck again add a little extra.
+				Entity.Position = newTransform.Position + (direction * offset) + (direction * 0.1f);
+			}
+		}
+		GetPossibleTransforms();
+	}
+	void DoCrushingStuff()
+	{
+		// TODO:
+	}
+	/*void DoPushingStuff()
+	{
+		var tr = TraceBBox( Entity.Position, Entity.Position );
+		if ( tr.StartedSolid && tr.Entity != null && !tr.Entity.IsWorld && tr.Entity != OldGroundEntity && tr.Entity != Entity.GroundEntity )
+		{
 			var tf = new Transform();
 			if ( OldTransforms != null && OldTransforms.TryGetValue( tr.Entity.NetworkIdent, out tf ) )
 			{
@@ -1200,7 +1250,7 @@ public partial class WalkController : MovementComponent
 			}
 		}
 		GetPossibleTransforms();
-	}
+	}*/
 
 	void GetPossibleTransforms()
 	{
