@@ -3,15 +3,12 @@
   "Type": "game",
   "Org": "xenthio",
   "Ident": "easy_fps_base",
-  "Tags": null,
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
   "ResourcePaths": [],
   "HasCode": true,
   "CodePath": "/code/",
-  "PackageReferences": [],
-  "EditorReferences": null,
   "Metadata": {
     "MaxPlayers": 64,
     "MinPlayers": 1,
@@ -23,8 +20,9 @@
     "RankType": "None",
     "PerMapRanking": false,
     "LeaderboardType": "None",
-    "ProjectTemplate": null,
-    "CsProjName": "",
+    "ProjectTemplate": {
+      "Icon": "vertical_align_bottom"
+    },
     "Collision": {
       "Defaults": {
         "solid": "Collide",
@@ -64,9 +62,6 @@
           "b": "player"
         }
       ]
-    },
-    "Summary": "",
-    "Description": "",
-    "Public": true
+    }
   }
 }
