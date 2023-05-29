@@ -1,14 +1,17 @@
 {
   "Title": "Easy FPS Base",
   "Type": "game",
-  "Org": "xenthio",
+  "Org": "local",
   "Ident": "easy_fps_base",
+  "Tags": null,
   "Schema": 1,
   "HasAssets": true,
   "AssetsPath": "",
   "ResourcePaths": [],
   "HasCode": true,
   "CodePath": "/code/",
+  "PackageReferences": [],
+  "EditorReferences": null,
   "Metadata": {
     "MaxPlayers": 64,
     "MinPlayers": 1,
@@ -62,6 +65,8 @@
           "b": "player"
         }
       ]
-    }
+    },
+    "CsProjName": "",
+    "HttpAllowList": null
   }
 }
