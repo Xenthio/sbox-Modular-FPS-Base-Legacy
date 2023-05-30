@@ -1099,52 +1099,124 @@ public partial class WalkController : MovementComponent
 	void DoPushingStuff()
 	{
 		var tr = TraceBBox( Entity.Position, Entity.Position );
-		if ( tr.StartedSolid && tr.Entity != null && !tr.Entity.IsWorld && tr.Entity != OldGroundEntity && tr.Entity != Entity.GroundEntity )
+		if ( tr.StartedSolid
+			&& tr.Entity != null
+			&& tr.Entity != OldGroundEntity
+			&& tr.Entity != Entity.GroundEntity
+			&& !tr.Entity.IsWorld
+			&& OldTransforms != null
+			&& OldTransforms.TryGetValue( tr.Entity.NetworkIdent, out var oldTransform ) )
 		{
-			if ( OldTransforms != null && OldTransforms.TryGetValue( tr.Entity.NetworkIdent, out var oldTransform ) )
+			if ( tr.Entity is BasePhysics ) return;
+			var oldPosition = Entity.Position;
+			var oldTransformLocal = oldTransform.ToLocal( Entity.Transform );
+			var newTransform = tr.Entity.Transform.ToWorld( oldTransformLocal );
+
+			// this used to be just the direction of the tr delta however pushing outwards a llittle seems more appropriate
+			var direction = ((Entity.Position - newTransform.Position) * -1);
+			direction += (Entity.Position - tr.Entity.Position).Normal.WithZ( 0 ) * 0.8f;
+
+			FindIdealMovementDirection( newTransform.Position, direction, out var outOffset, out var outDirection );
+
+
+			var newPosition = newTransform.Position + (outDirection * outOffset) + (outDirection * 0.1f);
+
+			// Check if we're being crushed, if not we set our position.
+			if ( IsBeingCrushed( newPosition ) )
 			{
-				var oldTransformLocal = oldTransform.ToLocal( Entity.Transform );
-				var newTransform = tr.Entity.Transform.ToWorld( oldTransformLocal );
-
-				// this used to be just the direction of the tr delta however pushing outwards a llittle seems more appropriate
-				var direction = ((Entity.Position - newTransform.Position) * -1).WithZ( 0 );
-				direction += (Entity.Position - tr.Entity.Position).Normal.WithZ( 0 ) * 0.8f;
-
-				// offset = how much are we inside of the platform? what is needed to work this out? surely theres a better and smarter way?
-				var offset = 0.0f;
-
-
-				// ------------------------ shit ------------------------
-				//			look into doing this nicer at somepoint
-				// ------------------------------------------------------
-				// brute force our way into finding how much extra we need to be pushed in the case of AABB edges being still inside of the object
-				for ( int i = 0; i < 512; i++ )
-				{
-					var possibleoffset = (float)(i) / 16f;
-					var pos = newTransform.Position + (direction * possibleoffset);
-
-					var offsettr = TraceBBox( pos, pos );
-					if ( !offsettr.StartedSolid )
-					{
-						if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
-						offset = possibleoffset;
-						break;
-					}
-					if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
-				}
-				// ------------------------------------------------------
-
-				Entity.Velocity += (direction / Time.Delta);
+				OnCrushed( tr.Entity );
+			}
+			else
+			{
+				Entity.Velocity += (outDirection / Time.Delta);
 
 				// insurance we dont instantly get stuck again add a little extra.
-				Entity.Position = newTransform.Position + (direction * offset) + (direction * 0.1f);
+				Entity.Position = newPosition;
+
 			}
 		}
+
+		// In order to get the delta of transforms we have not yet touched, we grab the transforms of EVERYTHING with in a radius.
+		// The radius we look in is determined by player speed and velocity 
 		GetPossibleTransforms();
 	}
-	void DoCrushingStuff()
+
+	void FindIdealMovementDirection( Vector3 Position, Vector3 Direction, out float OutOffset, out Vector3 OutDirection )
 	{
-		// TODO:
+		OutDirection = Direction;
+		OutOffset = 0;
+		// ------------------------ shit ------------------------
+		//			look into doing this nicer at somepoint
+		// ------------------------------------------------------
+		// brute force our way into finding how much extra we need to be pushed in the case of AABB edges being still inside of the object
+		for ( int i = 0; i < 512; i++ )
+		{
+			var possibleoffset = (float)(i) / 16f;
+			var pos = Position + (Direction * possibleoffset);
+
+			var offsettr = TraceBBox( pos, pos );
+
+			if ( !offsettr.StartedSolid )
+			{
+				if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
+				OutDirection = Direction;
+				OutOffset = possibleoffset;
+				break;
+			}
+
+			//sidewards test, for things moving sideways and upwards or downwards
+			var posside = Position + (Direction.WithZ( 0 ) * possibleoffset);
+			var offsettrside = TraceBBox( posside, posside );
+
+			if ( !offsettrside.StartedSolid )
+			{
+				if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
+				OutDirection = Direction.WithZ( 0 );
+				OutOffset = possibleoffset;
+
+				break;
+			}
+
+			if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Red, 5 );
+		}
+		// ------------------------------------------------------
+	}
+
+	bool IsBeingCrushed( Vector3 NewPosition )
+	{
+		//do a trace that will decide whether or not we're being crushed
+		var crushtrace = Trace.Ray( Entity.Position, NewPosition )
+				.Ignore( Entity )
+				.Run();
+
+		if ( PushDebug ) DebugOverlay.Line( crushtrace.StartPosition, crushtrace.EndPosition, Color.Blue, 5 );
+
+		return crushtrace.Fraction != 1;
+	}
+
+	void OnCrushed( Entity CurshingEntity )
+	{
+		// deal crush damage!
+		if ( !Game.IsServer ) return;
+		if ( CurshingEntity is DoorEntity || CurshingEntity is PlatformEntity || CurshingEntity is PathPlatformEntity )
+		{
+			Entity.TakeDamage( DamageInfo.Generic( 5 ).WithTag( "crush" ) );
+		}
+
+		// if we get crushed by a door, change its direction.
+		if ( CurshingEntity is DoorEntity door )
+		{
+			if ( door.State == DoorEntity.DoorState.Opening )
+			{
+				door.Close();
+				door.Close();
+			}
+			else if ( door.State == DoorEntity.DoorState.Closing )
+			{
+				door.Open();
+				door.Open();
+			}
+		}
 	}
 	/*void DoPushingStuff()
 	{
