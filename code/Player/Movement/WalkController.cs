@@ -879,7 +879,7 @@ public partial class WalkController : MovementComponent
 		// water on each call, and the converse case will correct itself if called twice.
 		//CheckWater();
 
-		var point = Entity.Position - Vector3.Up * 2;
+		var point = Entity.Position - Vector3.Up * (2 * Entity.Scale);
 		var vBumpOrigin = Entity.Position;
 
 		//
@@ -893,12 +893,12 @@ public partial class WalkController : MovementComponent
 		if ( Entity.GroundEntity != null ) // and not underwater
 		{
 			bMoveToEndPos = true;
-			point.z -= StepSize;
+			point.z -= StepSize * Entity.Scale;
 		}
 		else if ( bStayOnGround )
 		{
 			bMoveToEndPos = true;
-			point.z -= StepSize;
+			point.z -= StepSize * Entity.Scale;
 		}
 
 		if ( bMovingUpRapidly || Swimming ) // or ladder and moving up
@@ -989,6 +989,7 @@ public partial class WalkController : MovementComponent
 	{
 		if ( liftFeet > 0 )
 		{
+			liftFeet *= Entity.Scale;
 			start += Vector3.Up * liftFeet;
 			maxs = maxs.WithZ( maxs.z - liftFeet );
 		}
@@ -1008,8 +1009,8 @@ public partial class WalkController : MovementComponent
 	/// </summary>
 	public virtual void StayOnGround()
 	{
-		var start = Entity.Position + Vector3.Up * 2;
-		var end = Entity.Position + Vector3.Down * StepSize;
+		var start = Entity.Position + Vector3.Up * (2 * Entity.Scale);
+		var end = Entity.Position + Vector3.Down * (StepSize * Entity.Scale);
 
 		// See how far up we can go without getting stuck
 		var trace = TraceBBox( Entity.Position, start );
