@@ -26,7 +26,7 @@ public class FirstPersonCamera : CameraComponent
 		// Set the first person viewer to this, so it won't render our model
 		Camera.FirstPersonViewer = Entity;
 
-		Camera.ZNear = 8;
+		Camera.ZNear = 8 * pl.Scale;
 	}
 	public override void BuildInput()
 	{

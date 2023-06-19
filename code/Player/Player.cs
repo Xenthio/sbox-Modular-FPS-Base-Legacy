@@ -40,6 +40,7 @@ partial class Player : AnimatedEntity
 		Predictable = true;
 		EnableHitboxes = true;
 
+
 		MoveToSpawnpoint();
 		Event.Run( "Player.PostSpawn", this );
 	}

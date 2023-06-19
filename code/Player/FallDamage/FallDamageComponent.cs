@@ -11,9 +11,9 @@ public partial class FallDamageComponent : SimulatedComponent, ISingletonCompone
 	{
 		base.Simulate( cl );
 		var FallSpeed = -PreviousZVelocity;
-		if ( FallSpeed > SafeFallSpeed && Entity.GroundEntity != null )
+		if ( FallSpeed > (SafeFallSpeed * Entity.Scale) && Entity.GroundEntity != null )
 		{
-			var FallDamage = (FallSpeed - SafeFallSpeed) * DamageForSpeed;
+			var FallDamage = (FallSpeed - (SafeFallSpeed * Entity.Scale)) * (DamageForSpeed * Entity.Scale);
 			var info = DamageInfo.Generic( FallDamage ).WithTag( "fall" );
 			Entity.TakeDamage( info );
 			Entity.PlaySound( "falldamage" );

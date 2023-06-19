@@ -19,8 +19,8 @@ public class CitizenAnimationComponent : AnimationComponent
 
 		CitizenAnimationHelper animHelper = new CitizenAnimationHelper( ply );
 
-		animHelper.WithWishVelocity( ply.MovementController.WishVelocity );
-		animHelper.WithVelocity( ply.Velocity );
+		animHelper.WithWishVelocity( ply.MovementController.WishVelocity / Entity.Scale );
+		animHelper.WithVelocity( ply.Velocity / Entity.Scale );
 		animHelper.WithLookAt( ply.EyePosition + ply.ViewAngles.Forward * 100.0f, 1.0f, 1.0f, 0.5f );
 		animHelper.AimAngle = rotation;
 		animHelper.FootShuffle = shuffle;

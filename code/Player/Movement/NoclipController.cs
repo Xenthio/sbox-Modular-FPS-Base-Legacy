@@ -15,13 +15,12 @@ public partial class NoclipController : MovementComponent
 	public override void Simulate( IClient cl )
 	{
 
-
 		var pl = Entity as Player;
 
 		Events?.Clear();
 		Tags?.Clear();
 
-		pl.EyeLocalPosition = Vector3.Up * (EyeHeight * pl.Scale);
+		pl.EyeLocalPosition = Vector3.Up * EyeHeight;
 		pl.EyeRotation = pl.ViewAngles.ToRotation();
 
 		var fwd = pl.InputDirection.x.Clamp( -1f, 1f );
@@ -35,7 +34,7 @@ public partial class NoclipController : MovementComponent
 			vel += Vector3.Up * 1;
 		}
 
-		vel = vel.Normal * 2000;
+		vel = vel.Normal * (2000 * pl.Scale);
 
 		if ( Input.Down( "Run" ) )
 			vel *= 5.0f;

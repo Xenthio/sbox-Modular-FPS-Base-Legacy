@@ -119,7 +119,7 @@ public partial class WalkController : MovementComponent
 		Events?.Clear();
 		Tags?.Clear();
 
-		pl.EyeLocalPosition = Vector3.Up * (EyeHeight * pl.Scale);
+		pl.EyeLocalPosition = Vector3.Up * EyeHeight;
 		pl.EyeRotation = pl.ViewAngles.ToRotation();
 
 
@@ -156,7 +156,7 @@ public partial class WalkController : MovementComponent
 		//
 		if ( !Swimming && !IsTouchingLadder )
 		{
-			Entity.Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
+			Entity.Velocity -= new Vector3( 0, 0, (Gravity * Entity.Scale) * 0.5f ) * Time.Delta;
 			Entity.Velocity += new Vector3( 0, 0, Entity.BaseVelocity.z ) * Time.Delta;
 
 			Entity.BaseVelocity = Entity.BaseVelocity.WithZ( 0 );
@@ -227,6 +227,7 @@ public partial class WalkController : MovementComponent
 
 		WishVelocity = WishVelocity.Normal * inSpeed;
 		WishVelocity *= GetWishSpeed();
+		WishVelocity *= Entity.Scale;
 
 
 		bool bStayOnGround = false;
@@ -255,7 +256,7 @@ public partial class WalkController : MovementComponent
 		// FinishGravity
 		if ( !Swimming && !IsTouchingLadder )
 		{
-			Entity.Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
+			Entity.Velocity -= new Vector3( 0, 0, (Gravity * Entity.Scale) * 0.5f ) * Time.Delta;
 		}
 
 
@@ -301,7 +302,7 @@ public partial class WalkController : MovementComponent
 		if ( ws >= 0 ) return ws;
 
 		if ( Input.Down( "Duck" ) || IsDucking ) return CrouchSpeed;
-		if ( Input.Down( "Run" ) ) return SprintSpeed;
+		if ( Input.Down( "Run" ) ) return SprintSpeed; ;
 		if ( Input.Down( "Walk" ) ) return WalkSpeed;
 
 		return DefaultSpeed;
@@ -361,7 +362,7 @@ public partial class WalkController : MovementComponent
 
 		StayOnGround();
 
-		Entity.Velocity = Entity.Velocity.Normal * MathF.Min( Entity.Velocity.Length, GetWishSpeed() );
+		Entity.Velocity = Entity.Velocity.Normal * MathF.Min( Entity.Velocity.Length, (GetWishSpeed() * Entity.Scale) );
 	}
 
 	public virtual void StepMove()
@@ -370,7 +371,7 @@ public partial class WalkController : MovementComponent
 		mover.Trace = mover.Trace.Size( mins, maxs ).Ignore( Entity );
 		mover.MaxStandableAngle = GroundAngle;
 
-		mover.TryMoveWithStep( Time.Delta, StepSize );
+		mover.TryMoveWithStep( Time.Delta, StepSize * Entity.Scale );
 
 		Entity.Position = mover.Position;
 		Entity.Velocity = mover.Velocity;
@@ -396,8 +397,9 @@ public partial class WalkController : MovementComponent
 		// This gets overridden because some games (CSPort) want to allow dead (observer) players
 		// to be able to move around.
 		// if ( !CanAccelerate() )
-		//     return;
-
+		//     return; 
+		speedLimit *= Entity.Scale;
+		acceleration /= Entity.Scale;
 		if ( speedLimit > 0 && wishspeed > speedLimit )
 			wishspeed = speedLimit;
 
@@ -412,7 +414,7 @@ public partial class WalkController : MovementComponent
 			return;
 
 		// Determine amount of acceleration.
-		var accelspeed = acceleration * Time.Delta * wishspeed * SurfaceFriction;
+		var accelspeed = (acceleration * Entity.Scale) * Time.Delta * wishspeed * SurfaceFriction;
 
 		// Cap at addspeed
 		if ( accelspeed > addspeed )
@@ -428,18 +430,15 @@ public partial class WalkController : MovementComponent
 	{
 		// If we are in water jump cycle, don't apply friction
 		//if ( player->m_flWaterJumpTime )
-		//   return;
-
-		// Not on ground - no friction
-
-
-		// Calculate speed
+		//   return; 
+		// Not on ground - no friction   
+		// Calculate speed 
 		var speed = Entity.Velocity.Length;
 		if ( speed < 0.1f ) return;
 
 		// Bleed off some speed, but if we have less than the bleed
 		//  threshold, bleed the threshold amount.
-		float control = (speed < StopSpeed) ? StopSpeed : speed;
+		float control = (speed < StopSpeed * Entity.Scale) ? (StopSpeed * Entity.Scale) : speed;
 
 		// Add the amount to the drop amount.
 		var drop = control * Time.Delta * frictionAmount;
@@ -478,11 +477,11 @@ public partial class WalkController : MovementComponent
 			SetTag( "ducked" );
 			if ( pl.GroundEntity is null )
 			{
-				pl.Position += Vector3.Up * (delta);
+				pl.Position += Vector3.Up * (delta * Entity.Scale);
 				var pm = TraceBBox( Entity.Position, Entity.Position );
 				if ( pm.StartedSolid )
 				{
-					pl.Position -= Vector3.Up * (delta);
+					pl.Position -= Vector3.Up * (delta * Entity.Scale);
 				}
 			}
 			FixPlayerCrouchStuck( true );
@@ -496,17 +495,17 @@ public partial class WalkController : MovementComponent
 
 			if ( pl.GroundEntity is null )
 			{
-				pl.Position += Vector3.Up * (delta);
+				pl.Position += Vector3.Up * (delta * Entity.Scale);
 
 				var pm = TraceBBox( Entity.Position, Entity.Position );
 				if ( pm.StartedSolid )
 				{
-					pl.Position -= Vector3.Up * (delta);
+					pl.Position -= Vector3.Up * (delta * Entity.Scale);
 				}
 			}
 			CategorizePosition( false );
 		}
-		pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( EyeHeight + DuckAmount );
+		pl.EyeLocalPosition = pl.EyeLocalPosition.WithZ( EyeHeight + (DuckAmount) );
 
 	}
 	public float LocalDuckAmount { get; set; } = 0;
@@ -626,13 +625,12 @@ public partial class WalkController : MovementComponent
 			//   flGroundFactor = g_pPhysicsQuery->GetGameSurfaceproperties( player->m_pSurfaceData )->m_flJumpFactor;
 		}
 
-		float flMul = 268.3281572999747f * 1.2f;
-
+		float flMul = (268.3281572999747f * Entity.Scale) * 1.2f;
 		float startz = Entity.Velocity.z;
 
 		Entity.Velocity = Entity.Velocity.WithZ( startz + flMul * flGroundFactor );
 
-		Entity.Velocity -= new Vector3( 0, 0, Gravity * 0.5f ) * Time.Delta;
+		Entity.Velocity -= new Vector3( 0, 0, (Gravity * Entity.Scale) * 0.5f ) * Time.Delta;
 
 		// mv->m_outJumpVel.z += mv->m_vecVelocity[2] - startz;
 		// mv->m_outStepHeight += 0.15f;
@@ -717,7 +715,7 @@ public partial class WalkController : MovementComponent
 		tr = TraceBBox( vecStart, vecEnd );
 		if ( tr.Fraction < 1 && tr.Normal.z >= 0.7f )
 		{
-			Entity.Velocity = Entity.Velocity.WithZ( 256 );
+			Entity.Velocity = Entity.Velocity.WithZ( 256 * Entity.Scale );
 			Entity.Tags.Add( "waterjump" );
 			WaterJumpTime = 2000;
 		}
@@ -743,7 +741,7 @@ public partial class WalkController : MovementComponent
 
 		wishspeed *= 0.8f;
 
-		Accelerate( wishdir, wishspeed, 100, Acceleration );
+		Accelerate( wishdir, wishspeed, 100 * Entity.Scale, Acceleration );
 
 		Entity.Velocity += Entity.BaseVelocity;
 
@@ -783,7 +781,7 @@ public partial class WalkController : MovementComponent
 				Eject.y = LadderNormal.y * sidem;
 				Eject.z = (3 * upm).Clamp( 0, 1 );
 
-				Entity.Velocity += Eject * 180.0f;
+				Entity.Velocity += (Eject * 180.0f) * Entity.Scale;
 				IsTouchingLadder = false;
 
 				return;
