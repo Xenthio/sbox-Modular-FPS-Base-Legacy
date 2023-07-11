@@ -49,22 +49,19 @@ public partial class Gun : Weapon
 	}
 	public virtual void ShootBullet( float damage = 0, float spread = 0, float force = 0, int count = 1 )
 	{
-		for ( int i = 0; i < count; i++ )
+		//ShootBullet( null, null, null, damage, spread, force, count, 0 );
+		var bullet = new BulletInfo()
 		{
-			Game.SetRandomSeed( Time.Tick + i );
-			var forward = Owner.AimRay.Forward;
-			forward += Vector3.Random * spread;
-			var tr = Trace.Ray( Owner.AimRay.Position, Owner.AimRay.Position + (forward * 65565) ).UseHitboxes().Ignore( Owner ).WithoutTags( "trigger" ).Run();
-			if ( tr.Hit )
-			{
-				tr.Surface.DoBulletImpact( tr );
-				if ( tr.Entity.IsValid() )
-				{
-					if ( tr.Hitbox.HasTag( "head" ) )
-						damage *= 2;
-					tr.Entity.TakeDamage( DamageInfo.FromBullet( tr.HitPosition, forward * force, damage ).WithWeapon( this ).WithAttacker( Owner ) );
-				}
-			}
-		}
-	}
+			Owner = Owner,
+			Weapon = this,
+			Position = Owner.AimRay.Position,
+			Direction = Owner.AimRay.Forward,
+			Damage = damage,
+			Spread = spread,
+			Force = force,
+			Count = count, 
+			TracerPosition = (EffectEntity.GetAttachment( "muzzle" ) ?? Transform).Position
+		};
+		Bullet.ShootBullet( bullet );
+	} 
 }
