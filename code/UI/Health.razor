@@ -18,7 +18,8 @@
 </style>
 
 <root class="health">  
-	@if (Game.LocalPawn.LifeState == LifeState.Alive)
+	@if (Game.LocalPawn.LifeState == LifeState.Alive) 
+	{
 		<div class="seg">@Math.Round(Game.LocalPawn.Health)</div>
 	} 
 </root> 
