@@ -100,9 +100,12 @@ public partial class WalkController : MovementComponent
 	{
 		base.FrameSimulate( cl );
 		if ( ShowBBox ) DebugOverlay.Box( Entity.Position, mins, maxs, Color.Yellow );
+		//RestoreGroundPos();
 		RestoreGroundAngles();
 		var pl = Entity as Player;
+		//CategorizePosition( false ); 
 		SaveGroundAngles();
+		//SaveGroundPos();
 		DuckFrameSimulate();
 	}
 
@@ -1037,13 +1040,12 @@ public partial class WalkController : MovementComponent
 	{
 		if ( Entity.GroundEntity == null || Entity.GroundEntity.IsWorld || GroundTransform == null || Entity.GroundEntity != OldGroundEntity )
 			return;
-
+		 
 		var worldTrns = Entity.GroundEntity.Transform.ToWorld( GroundTransform.Value );
 		if ( Prediction.FirstTime )
 		{
-			Entity.BaseVelocity = ((Entity.Position - worldTrns.Position) * -1) / Time.Delta;
-		}
-		//Entity.Position = (Entity.Position.WithZ( worldTrns.Position.z ));
+			Entity.BaseVelocity = (((Entity.Position - worldTrns.Position) * -1) / Time.Delta);
+		} 
 	}
 
 	void SaveGroundPos()
@@ -1106,15 +1108,16 @@ public partial class WalkController : MovementComponent
 			&& OldTransforms != null
 			&& OldTransforms.TryGetValue( tr.Entity.NetworkIdent, out var oldTransform ) )
 		{
-			if ( tr.Entity is BasePhysics ) return;
+
+			if ( tr.Entity is BasePhysics ) return; 
 			var oldPosition = Entity.Position;
 			var oldTransformLocal = oldTransform.ToLocal( Entity.Transform );
 			var newTransform = tr.Entity.Transform.ToWorld( oldTransformLocal );
 
 			// this used to be just the direction of the tr delta however pushing outwards a llittle seems more appropriate
 			var direction = ((Entity.Position - newTransform.Position) * -1);
-			direction += (Entity.Position - tr.Entity.Position).Normal.WithZ( 0 ) * 0.8f;
-
+			//direction += (Entity.Position - tr.Entity.Position).Normal.WithZ( 0 ) * 0.8f;
+			 
 			FindIdealMovementDirection( newTransform.Position, direction, out var outOffset, out var outDirection );
 
 
@@ -1130,7 +1133,13 @@ public partial class WalkController : MovementComponent
 				Entity.Velocity += (outDirection / Time.Delta);
 
 				// insurance we dont instantly get stuck again add a little extra.
-				Entity.Position = newPosition;
+				//Entity.Position = newPosition;
+				var b = new MoveHelper( Entity.Position, Entity.Velocity );
+				b.Trace = b.Trace.Size( mins, maxs ).Ignore(Entity).Ignore( tr.Entity );
+				b.TryMove(Time.Delta); 
+				Entity.Position = b.Position;
+				Entity.Velocity = b.Velocity;
+
 
 			}
 		}
@@ -1159,7 +1168,7 @@ public partial class WalkController : MovementComponent
 			{
 				if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
 				OutDirection = Direction;
-				OutOffset = possibleoffset;
+				OutOffset = possibleoffset; 
 				break;
 			}
 
@@ -1172,7 +1181,6 @@ public partial class WalkController : MovementComponent
 				if ( PushDebug ) DebugOverlay.Line( Entity.Position, pos, Color.Green, 5 );
 				OutDirection = Direction.WithZ( 0 );
 				OutOffset = possibleoffset;
-
 				break;
 			}
 

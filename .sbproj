@@ -68,6 +68,29 @@
       ]
     },
     "CsProjName": "",
-    "HttpAllowList": null
+    "HttpAllowList": null,
+    "TickRate": 50,
+    "LaunchConfigs": [
+      {
+        "Name": "My New Config",
+        "GameIdent": "xenthio.easy_fps_base#local",
+        "MapName": "facepunch.square",
+        "MaxPlayers": 1,
+        "GameSettings": {},
+        "Addons": "",
+        "PreLaunchCommand": "",
+        "PostLaunchCommand": ""
+      },
+      {
+        "Name": "Untitled Config",
+        "GameIdent": "xenthio.easy_fps_base#local",
+        "MapName": "fpstestingkit.vmap",
+        "MaxPlayers": 1,
+        "GameSettings": {},
+        "Addons": "",
+        "PreLaunchCommand": "",
+        "PostLaunchCommand": ""
+      }
+    ]
   }
 }
