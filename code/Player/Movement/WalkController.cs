@@ -1136,8 +1136,8 @@ public partial class WalkController : MovementComponent
 				//Entity.Position = newPosition;
 				var b = new MoveHelper( Entity.Position, Entity.Velocity );
 				b.Trace = b.Trace.Size( mins, maxs ).Ignore(Entity).Ignore( tr.Entity );
-				b.TryMove(Time.Delta); 
-				Entity.Position = b.Position;
+				b.TryMove(Time.Delta);
+				Entity.Position = b.Position + ((b.Position - Entity.Position) * 0.1275f);
 				Entity.Velocity = b.Velocity;
 
 
