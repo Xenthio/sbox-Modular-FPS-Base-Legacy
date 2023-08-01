@@ -1045,6 +1045,7 @@ public partial class WalkController : MovementComponent
 		if ( Prediction.FirstTime )
 		{
 			Entity.BaseVelocity = (((Entity.Position - worldTrns.Position) * -1) / Time.Delta);
+			Entity.Velocity += new Vector3( 0, 0, (((Entity.Position - worldTrns.Position) * -1) / Time.Delta).z );
 		} 
 	}
 
